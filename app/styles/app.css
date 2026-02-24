@@ -1,0 +1,310 @@
+@import "tailwindcss";
+
+html,
+body {
+	height: 100%;
+	margin: 0;
+}
+
+@theme {
+	/* === Brand Colors (dark-adapted, brighter) === */
+	--color-jj-purple: #a78bfa;
+	--color-jj-purple-dim: #8b5cf6;
+	--color-jj-purple-bright: #c4b5fd;
+	--color-jj-blue: #60a5fa;
+	--color-git-orange: #fb923c;
+	--color-git-orange-dim: #f97316;
+	--color-git-orange-bright: #fdba74;
+	--color-git-red: #f87171;
+	--color-wc-green: #34d399;
+	--color-immutable-gray: #9ca3af;
+
+	/* === Surfaces === */
+	--color-surface-base: #0f1117;
+	--color-surface-card: #161822;
+	--color-surface: #161822;
+	--color-surface-raised: #1c1f2e;
+	--color-surface-overlay: #252838;
+
+	/* === Borders === */
+	--color-border: rgba(255, 255, 255, 0.06);
+	--color-border-strong: rgba(255, 255, 255, 0.1);
+	--color-border-accent: rgba(255, 255, 255, 0.16);
+
+	/* === Text === */
+	--color-text-primary: #e4e5eb;
+	--color-text-secondary: #b0b4c4;
+	--color-text-muted: #8890a4;
+	--color-text-dim: #606880;
+
+	/* === ReactFlow Backgrounds === */
+	--color-dag-jj: #1a1528;
+	--color-dag-git: #1a1712;
+	--color-dag-neutral: #14151f;
+
+	/* === Typography === */
+	--font-heading: "Bricolage Grotesque", system-ui, sans-serif;
+	--font-sans: "Manrope", system-ui, sans-serif;
+	--font-mono: "Fira Code", ui-monospace, monospace;
+}
+
+/* === Base === */
+body {
+	font-family: var(--font-sans);
+	background: var(--color-surface-base);
+	color: var(--color-text-primary);
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+/* === Animations === */
+@keyframes fade-in-up {
+	from {
+		opacity: 0;
+		transform: translateY(10px);
+	}
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
+}
+
+@keyframes slide-in-left {
+	from {
+		opacity: 0;
+		transform: translateX(-16px);
+	}
+	to {
+		opacity: 1;
+		transform: translateX(0);
+	}
+}
+
+@keyframes shimmer {
+	0% {
+		background-position: -200% 0;
+	}
+	100% {
+		background-position: 200% 0;
+	}
+}
+
+@keyframes pulse-subtle {
+	0%,
+	100% {
+		opacity: 1;
+	}
+	50% {
+		opacity: 0.4;
+	}
+}
+
+@keyframes glow-breathe {
+	0%,
+	100% {
+		box-shadow: 0 0 6px rgba(167, 139, 250, 0.3);
+	}
+	50% {
+		box-shadow: 0 0 14px rgba(167, 139, 250, 0.6);
+	}
+}
+
+@keyframes node-pulse {
+	0%,
+	100% {
+		box-shadow: 0 0 4px rgba(167, 139, 250, 0.4);
+	}
+	50% {
+		box-shadow: 0 0 10px rgba(167, 139, 250, 0.7);
+	}
+}
+
+/* === Blueprint Grid Background === */
+.bg-blueprint {
+	background-image: radial-gradient(
+		circle,
+		rgba(167, 139, 250, 0.06) 1px,
+		transparent 1px
+	);
+	background-size: 20px 20px;
+}
+
+/* === Dark Glass Effects === */
+.glass {
+	background: rgba(22, 24, 34, 0.8);
+	backdrop-filter: blur(20px) saturate(150%);
+	-webkit-backdrop-filter: blur(20px) saturate(150%);
+}
+
+.glass-strong {
+	background: rgba(15, 17, 23, 0.9);
+	backdrop-filter: blur(24px) saturate(150%);
+	-webkit-backdrop-filter: blur(24px) saturate(150%);
+}
+
+/* === Scrollbar === */
+* {
+	scrollbar-width: thin;
+	scrollbar-color: #2a2d3e transparent;
+}
+
+::-webkit-scrollbar {
+	width: 6px;
+	height: 6px;
+}
+
+::-webkit-scrollbar-track {
+	background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+	background: #2a2d3e;
+	border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+	background: #3d4155;
+}
+
+/* === Navigation: DAG Node Metaphor === */
+.nav-item {
+	animation: slide-in-left 0.4s ease-out both;
+	position: relative;
+}
+
+.nav-node {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	border: 1.5px solid var(--color-text-dim);
+	background: transparent;
+	transition: all 0.25s ease;
+	flex-shrink: 0;
+}
+
+.nav-item-active .nav-node {
+	background: var(--color-jj-purple);
+	border-color: var(--color-jj-purple);
+	animation: node-pulse 2.5s ease-in-out infinite;
+}
+
+.nav-item:hover .nav-node {
+	border-color: var(--color-text-muted);
+	background: var(--color-text-dim);
+}
+
+.nav-item-active:hover .nav-node {
+	background: var(--color-jj-purple);
+	border-color: var(--color-jj-purple);
+}
+
+.nav-edge {
+	width: 1.5px;
+	height: 8px;
+	background: var(--color-text-dim);
+	margin-left: 3.25px;
+	opacity: 0.5;
+}
+
+.nav-active-bg {
+	background: rgba(167, 139, 250, 0.1);
+	box-shadow: inset 2px 0 0 var(--color-jj-purple);
+}
+
+/* === Loading Bar === */
+.loading-bar {
+	background: linear-gradient(
+		90deg,
+		var(--color-jj-purple),
+		var(--color-jj-blue),
+		var(--color-jj-purple)
+	);
+	background-size: 200% 100%;
+	animation: shimmer 1.5s infinite linear;
+}
+
+/* === Page Transition === */
+.page-enter {
+	animation: fade-in-up 0.35s ease-out;
+}
+
+/* === Selection === */
+::selection {
+	background: rgba(167, 139, 250, 0.25);
+	color: #fff;
+}
+
+/* === Focus Ring === */
+:focus-visible {
+	outline: 2px solid rgba(167, 139, 250, 0.5);
+	outline-offset: 2px;
+}
+
+/* === Glow Utilities === */
+.glow-purple {
+	box-shadow:
+		0 0 12px rgba(167, 139, 250, 0.2),
+		0 0 4px rgba(167, 139, 250, 0.1);
+}
+
+.glow-orange {
+	box-shadow:
+		0 0 12px rgba(251, 146, 60, 0.2),
+		0 0 4px rgba(251, 146, 60, 0.1);
+}
+
+.glow-purple-strong {
+	box-shadow:
+		0 0 20px rgba(167, 139, 250, 0.3),
+		0 0 6px rgba(167, 139, 250, 0.15);
+}
+
+.glow-orange-strong {
+	box-shadow:
+		0 0 20px rgba(251, 146, 60, 0.3),
+		0 0 6px rgba(251, 146, 60, 0.15);
+}
+
+/* === Card Hover (dark) === */
+.card-hover {
+	transition: all 0.2s ease;
+}
+
+.card-hover:hover {
+	border-color: rgba(255, 255, 255, 0.12);
+	background: var(--color-surface-raised);
+	box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+/* === ReactFlow Controls (dark) === */
+.react-flow__controls {
+	background: #161822 !important;
+	border: 1px solid rgba(255, 255, 255, 0.1) !important;
+	border-radius: 8px !important;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+}
+
+.react-flow__controls-button {
+	background: #161822 !important;
+	border-bottom: 1px solid rgba(255, 255, 255, 0.06) !important;
+	fill: #9ca0b0 !important;
+	color: #9ca0b0 !important;
+}
+
+.react-flow__controls-button:hover {
+	background: #1c1f2e !important;
+	fill: #e4e5eb !important;
+	color: #e4e5eb !important;
+}
+
+.react-flow__controls-button:last-child {
+	border-bottom: none !important;
+}
+
+.react-flow__controls-button svg {
+	fill: inherit !important;
+}
+
+.react-flow__controls-button svg path {
+	fill: inherit !important;
+}
