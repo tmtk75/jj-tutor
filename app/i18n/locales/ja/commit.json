@@ -1,0 +1,39 @@
+{
+	"title": "Commit",
+	"subtitle": "作業コピーの変更をどうするか。jj のコミットワークフローを理解する。",
+	"wcStatus": {
+		"noChanges": "変更なし（empty commit）"
+	},
+	"whatToDo": "この変更をどうする？",
+	"op": {
+		"commit": {
+			"desc": "WC に説明を付けて確定し、その上に新しい空の WC を作成する。jj describe + jj new と同等。"
+		},
+		"split": {
+			"desc": "WC の変更を対話的に2つのコミットに分割。エディタが開き、最初のコミットに含めるファイル/ハンクを選択。残りは新しい WC に残る。"
+		},
+		"squash": {
+			"desc": "WC の変更を親コミットに吸収する。git commit --amend 相当。WC は空になるが change ID は保持。"
+		},
+		"describe": {
+			"desc": "WC の説明（コミットメッセージ）を設定/変更する。DAG 構造もファイルも変わらない。"
+		}
+	},
+	"splitSim": {
+		"title": "Split シミュレーター",
+		"subtitle": "<code>jj split</code> で WC の変更をどう分割するかを視覚的にシミュレーション。",
+		"noChanges": "WC に変更がないため split シミュレーションできません",
+		"instructions": "ファイルをクリックして Commit 1 / Commit 2 に振り分けてみましょう。実際の <code>jj split</code> ではハンク単位で分割できます。",
+		"filesHeader": "WC の変更ファイル（クリックで切り替え）",
+		"beforeLabel": "Before（現在）",
+		"afterLabel": "After（split 後）",
+		"remaining": "remaining",
+		"firstCommit": "first commit",
+		"flowTitle": "jj split の流れ",
+		"step1": "<code>jj split</code> を実行",
+		"step2": "エディタが開き、最初のコミットに含める変更を選択",
+		"step3": "保存して閉じると、選択した変更が新コミットに、残りが WC に残る",
+		"step4": "特定ファイルだけ分離: <code>jj split path/to/file</code>",
+		"gitNote": "git では git reset HEAD~ → git add -p → git commit → git add -A → git commit という複数ステップが必要。jj split は1コマンドで完結。"
+	}
+}

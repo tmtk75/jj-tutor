@@ -1,0 +1,66 @@
+{
+	"pageDescription": "jj records all repository operations. More powerful than git's reflog, you can undo/restore any operation. Click an operation to see the command to restore to that point.",
+	"divergentBanner": {
+		"title": "Divergent Change detected",
+		"description": "has diverged. Find the <1>operation before divergence</1> in the timeline below and use",
+		"restoreHint": "to restore.",
+		"faqLink": "See FAQ for details →"
+	},
+	"restore": {
+		"title": "Restore to this operation",
+		"undoAvailable": "This is the previous operation, so <1>jj undo</1> can be used:",
+		"undoNote": "undo reverses only the last operation. You can undo the undo itself, so it's safe.",
+		"opRestoreNeeded": "This is {{stepsBack}} operations ago, so use <1>jj op restore</1>:",
+		"opRestoreNote": "op restore restores the entire repository to this operation's state. All {{stepsBack}} operations in between will be rolled back.",
+		"undoRepeatWarning": "Repeating jj undo {{stepsBack}} times won't work",
+		"undoRepeatExplanation": "Since undo itself is recorded as a new operation, the second undo would reverse the first undo, bringing you back to where you started. Use op restore for going back more than one step.",
+		"opRestoreAlternative": "op restore also works:"
+	},
+	"currentOp": {
+		"title": "Current operation",
+		"description": "This is the latest operation. There are no newer operations.",
+		"undoHint": "To undo the previous operation:"
+	},
+	"beforeRestore": {
+		"title": "Verify before restoring",
+		"whatHappened": "1. <1>What happened</1> (commits added/removed/moved):",
+		"whatHappenedNote": "Operation-level diff. Shows which commits were added/removed/changed. Does not show code content.",
+		"codeDiff": "2. <1>Code diff</1>:",
+		"codeDiffNote": "Shows file diff of the WC at the operation point. Shows actual code changes.",
+		"opDiffVsDiff": {
+			"title": "op diff vs diff",
+			"opDiffDesc": "= \"which commits moved\" before/after the operation (metadata)",
+			"diffDesc": "= \"how the code changed\" (file content)",
+			"workflow": "Check commit IDs with op diff → view code with diff --from/--to, a two-step workflow."
+		}
+	},
+	"undoVsRestore": {
+		"title": "undo vs restore",
+		"undoDesc": "— Reverses only the last operation. Since undo is also recorded as an operation, consecutive undos become \"undo of undo\"",
+		"restoreDesc": "— Restores the entire repo to a specified point. Works regardless of how many operations ago",
+		"note": "Both are recorded in op log, so you can restore again after a restore to go back."
+	},
+	"gitComparison": {
+		"title": "Git equivalents",
+		"opLog": "→ <1>git reflog</1> (though jj's is far more detailed)",
+		"undo": "→ <1>git reset / git reflog + checkout</1> (jj is safer and simpler)",
+		"opRestore": "→ (no direct git equivalent; restores the entire repo to a past state)"
+	},
+	"idGuide": {
+		"title": "Understanding IDs",
+		"opIdDesc": "— Operation ID. Assigned to each operation. Used with",
+		"opIdUsage": "",
+		"commitIdDesc": "— Commit ID. The commit's ID",
+		"commitIdNote": "at the time of the operation",
+		"footer": "Commit ID is the same as git's commit hash. In jj, the commit ID changes every time you edit a file, so IDs shown here may not exist in the current",
+		"footerNote": ". Use change ID for tracking as it remains constant."
+	},
+	"recorded": {
+		"title": "What gets recorded",
+		"snapshot": "— Detects file changes and auto-snapshots. Not recorded if nothing changed.",
+		"newCommit": "— Running jj new",
+		"rebase": "— Running jj rebase",
+		"describe": "— Running jj describe",
+		"footer": "All jj commands first check the working copy and record a snapshot if there are changes, then execute the intended operation."
+	}
+}

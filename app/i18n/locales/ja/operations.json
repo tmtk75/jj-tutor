@@ -1,0 +1,66 @@
+{
+	"pageDescription": "jj はリポジトリへの全操作を記録します。git の reflog よりも強力で、任意の操作を undo/restore できます。操作をクリックすると、その時点に戻すコマンドを確認できます。",
+	"divergentBanner": {
+		"title": "Divergent Change が発生中",
+		"description": "が分岐しています。下のタイムラインから<1>分岐前の操作</1>を探して",
+		"restoreHint": "で戻すのが確実です。",
+		"faqLink": "詳細はFAQへ →"
+	},
+	"restore": {
+		"title": "この操作時点に戻すには",
+		"undoAvailable": "直前の操作なので <1>jj undo</1> が使えます:",
+		"undoNote": "undo は直前の1操作を取り消す。undo 自体も undo できるので安心。",
+		"opRestoreNeeded": "{{stepsBack}} 操作前なので <1>jj op restore</1> を使います:",
+		"opRestoreNote": "op restore はリポジトリ全体をこの操作時点の状態に復元する。間の {{stepsBack}} 操作すべてが巻き戻される。",
+		"undoRepeatWarning": "jj undo を {{stepsBack}} 回繰り返すのは NG",
+		"undoRepeatExplanation": "undo 自体が新しい操作として記録されるため、2回目の undo は「1回目の undo を取り消す」動作になり元に戻ってしまう。2操作以上戻すには op restore 一択。",
+		"opRestoreAlternative": "op restore でも同じ結果:"
+	},
+	"currentOp": {
+		"title": "現在の操作",
+		"description": "これが最新の操作です。ここより新しい操作はありません。",
+		"undoHint": "直前の操作に戻すには:"
+	},
+	"beforeRestore": {
+		"title": "戻す前に確認",
+		"whatHappened": "1. <1>何が起きたか</1>（commit の増減・移動）:",
+		"whatHappenedNote": "操作レベルの差分。どの commit が追加/削除/変更されたかを表示。コードの中身は出ない。",
+		"codeDiff": "2. <1>コードの中身の差分</1>:",
+		"codeDiffNote": "操作時点での WC のファイル差分を表示。実際のコード変更が見える。",
+		"opDiffVsDiff": {
+			"title": "op diff vs diff の違い",
+			"opDiffDesc": "= 操作の前後で「どの commit が動いたか」（メタ情報）",
+			"diffDesc": "= 「コードの中身がどう変わったか」（ファイル内容）",
+			"workflow": "op diff で commit ID を確認 → diff --from/--to でコードを見る、という2段階の使い方。"
+		}
+	},
+	"undoVsRestore": {
+		"title": "undo vs restore",
+		"undoDesc": "— 直前の1操作だけ取り消す。undo 自体も操作として記録されるため、連続実行すると「undo の undo」になる",
+		"restoreDesc": "— 指定時点にリポ全体を復元。何操作前でも一発で戻れる",
+		"note": "どちらも op log に記録されるので、restore した後にさらに restore で元に戻すことも可能。"
+	},
+	"gitComparison": {
+		"title": "git との対応",
+		"opLog": "→ <1>git reflog</1>（ただし jj の方がはるかに詳細）",
+		"undo": "→ <1>git reset / git reflog + checkout</1>（jj の方が安全・簡単）",
+		"opRestore": "→（git には直接の対応なし。リポ全体を過去の状態に戻せる）"
+	},
+	"idGuide": {
+		"title": "ID の見方",
+		"opIdDesc": "— operation ID。操作ごとに付く ID。",
+		"opIdUsage": "で使う",
+		"commitIdDesc": "— commit ID。",
+		"commitIdNote": "での対象コミットの ID",
+		"footer": "commit ID は git の commit hash と同じもの。jj ではファイルを編集するたびに commit ID が変わるため、ここに表示される ID は現在の",
+		"footerNote": "には存在しないことがある。change ID は不変なので追跡にはそちらを使う。"
+	},
+	"recorded": {
+		"title": "記録されるもの",
+		"snapshot": "— ファイル変更を検知して自動スナップショット。変更がなければ記録されない。",
+		"newCommit": "— jj new の実行",
+		"rebase": "— jj rebase の実行",
+		"describe": "— jj describe の実行",
+		"footer": "全ての jj コマンドはまず working copy をチェックし、差分があれば snapshot を記録してから本来の操作を実行する。"
+	}
+}

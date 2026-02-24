@@ -1,0 +1,39 @@
+{
+	"title": "Commit",
+	"subtitle": "What to do with your working copy changes. Understand jj's commit workflow.",
+	"wcStatus": {
+		"noChanges": "No changes (empty commit)"
+	},
+	"whatToDo": "What to do with these changes?",
+	"op": {
+		"commit": {
+			"desc": "Add a description to the WC, finalize it, and create a new empty WC on top. Equivalent to jj describe + jj new."
+		},
+		"split": {
+			"desc": "Interactively split WC changes into two commits. An editor opens to select files/hunks for the first commit. The rest stays in the new WC."
+		},
+		"squash": {
+			"desc": "Absorb WC changes into the parent commit. Equivalent to git commit --amend. WC becomes empty but retains its change ID."
+		},
+		"describe": {
+			"desc": "Set or change the WC description (commit message). Neither DAG structure nor files change."
+		}
+	},
+	"splitSim": {
+		"title": "Split Simulator",
+		"subtitle": "Visually simulate how <code>jj split</code> divides your WC changes.",
+		"noChanges": "No changes in WC — cannot simulate split",
+		"instructions": "Click files to assign them to Commit 1 or Commit 2. In a real <code>jj split</code>, you can split at the hunk level.",
+		"filesHeader": "WC changed files (click to toggle)",
+		"beforeLabel": "Before (current)",
+		"afterLabel": "After (post-split)",
+		"remaining": "remaining",
+		"firstCommit": "first commit",
+		"flowTitle": "How jj split works",
+		"step1": "Run <code>jj split</code>",
+		"step2": "An editor opens to select changes for the first commit",
+		"step3": "Save and close — selected changes go to a new commit, the rest stays in WC",
+		"step4": "Split specific files only: <code>jj split path/to/file</code>",
+		"gitNote": "In git, this requires multiple steps: git reset HEAD~ → git add -p → git commit → git add -A → git commit. jj split does it in one command."
+	}
+}

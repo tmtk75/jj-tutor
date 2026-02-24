@@ -1,4 +1,5 @@
-import { Handle, Position, type NodeProps, type Node } from "@xyflow/react";
+import { Handle, type Node, type NodeProps, Position } from "@xyflow/react";
+import { useTranslation } from "react-i18next";
 import type { GitCommit } from "~/shared";
 import { CopyableHash } from "./CopyableHash";
 import { RelativeTime } from "./RelativeTime";
@@ -6,7 +7,10 @@ import { RelativeTime } from "./RelativeTime";
 type GitCommitNodeData = GitCommit & { label: string; [key: string]: unknown };
 type GitCommitNodeType = Node<GitCommitNodeData, "gitCommit">;
 
-function getGitHint(data: GitCommitNodeData): string | null {
+function getGitHint(
+	data: GitCommitNodeData,
+	t: (key: string) => string,
+): string | null {
 	const hasJjKeep = data.refs.some((r) => r.includes("jj/keep"));
 	const hasBranch = data.refs.some(
 		(r) => !r.includes("HEAD") && !r.includes("jj/"),
@@ -14,34 +18,41 @@ function getGitHint(data: GitCommitNodeData): string | null {
 	const hasHead = data.refs.some((r) => r.includes("HEAD"));
 
 	if (hasJjKeep && !hasBranch) {
-		return "jj 内部スナップショット。jj が作業コピーを自動保存。git には見えるが jj log には出ない。jj の change ID とは別物。";
+		return t("gitHint.jjKeep");
 	}
 	if (hasHead && hasBranch) {
-		return "HEAD + ブランチ。git checkout で移動。jj では jj new / jj edit で移動（HEAD は jj が自動管理）。";
+		return t("gitHint.headAndBranch");
 	}
 	if (hasHead) {
-		return "HEAD: git の現在位置。jj では @ (作業コピー) に相当。git checkout = jj edit。";
+		return t("gitHint.head");
 	}
 	if (hasBranch) {
-		return "git ブランチ = jj bookmark。git branch = jj bookmark create。git merge = jj new branchA branchB。";
+		return t("gitHint.branch");
 	}
 	if (data.parents.length === 0) {
-		return "root commit。jj が内部管理用に作成。git の初回コミットとは異なる。";
+		return t("gitHint.rootCommit");
 	}
 	return null;
 }
 
 export function GitCommitNode({ data }: NodeProps<GitCommitNodeType>) {
+	const { t } = useTranslation("dag");
 	const hasHead = data.refs.some((r) => r.includes("HEAD"));
-	const hint = getGitHint(data);
+	const hint = getGitHint(data, t);
 
 	return (
 		<div
 			className={`rounded-lg border-2 ${hint ? "w-80" : "w-52"} ${
-				hasHead ? "border-git-orange bg-git-orange/10" : "border-border-strong bg-surface-card"
+				hasHead
+					? "border-git-orange bg-git-orange/10"
+					: "border-border-strong bg-surface-card"
 			}`}
 		>
-			<Handle type="target" position={Position.Bottom} className="!bg-text-dim !w-2 !h-2" />
+			<Handle
+				type="target"
+				position={Position.Bottom}
+				className="!bg-text-dim !w-2 !h-2"
+			/>
 			<div className={hint ? "flex divide-x divide-border" : ""}>
 				<div className="px-3 py-2 flex-1 min-w-0">
 					<div className="flex items-center gap-2">
@@ -83,7 +94,11 @@ export function GitCommitNode({ data }: NodeProps<GitCommitNodeType>) {
 					</div>
 				)}
 			</div>
-			<Handle type="source" position={Position.Top} className="!bg-text-dim !w-2 !h-2" />
+			<Handle
+				type="source"
+				position={Position.Top}
+				className="!bg-text-dim !w-2 !h-2"
+			/>
 		</div>
 	);
 }

@@ -1,4 +1,5 @@
 import { useState, useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import type { JjCommit, JjStatus } from "~/shared";
 
 interface FileEntry {
@@ -100,7 +101,7 @@ const OPERATIONS: OpCard[] = [
 ];
 
 // --- Split simulator ---
-function SplitSimulator({ files }: { files: FileEntry[] }) {
+function SplitSimulator({ files, t }: { files: FileEntry[]; t: (key: string, options?: Record<string, unknown>) => string }) {
 	const [assignments, setAssignments] = useState<Record<string, SplitAssignment>>(() => {
 		const init: Record<string, SplitAssignment> = {};
 		for (const f of files) {
@@ -128,22 +129,19 @@ function SplitSimulator({ files }: { files: FileEntry[] }) {
 	if (files.length === 0) {
 		return (
 			<div className="text-xs text-text-dim py-4 text-center">
-				WC に変更がないため split シミュレーションできません
+				{t("splitSim.noChanges")}
 			</div>
 		);
 	}
 
 	return (
 		<div className="space-y-4">
-			<div className="text-xs text-text-muted">
-				ファイルをクリックして Commit 1 / Commit 2 に振り分けてみましょう。
-				実際の <code className="bg-surface-raised px-1 rounded">jj split</code> ではハンク単位で分割できます。
-			</div>
+			<div className="text-xs text-text-muted" dangerouslySetInnerHTML={{ __html: t("splitSim.instructions") }} />
 
 			{/* File assignment area */}
 			<div className="border rounded-lg overflow-hidden">
 				<div className="bg-surface px-3 py-1.5 text-[10px] font-bold text-text-muted uppercase tracking-wider border-b">
-					WC の変更ファイル（クリックで切り替え）
+					{t("splitSim.filesHeader")}
 				</div>
 				<div className="divide-y divide-border">
 					{files.map((f) => {
@@ -185,7 +183,7 @@ function SplitSimulator({ files }: { files: FileEntry[] }) {
 				{/* Before */}
 				<div className="flex-1 border rounded-lg p-3">
 					<div className="text-[10px] font-bold text-text-dim uppercase tracking-wider mb-2">
-						Before（現在）
+						{t("splitSim.beforeLabel")}
 					</div>
 					<div className="font-mono text-xs space-y-1">
 						<div className="flex items-center gap-2">
@@ -205,13 +203,13 @@ function SplitSimulator({ files }: { files: FileEntry[] }) {
 				{/* After */}
 				<div className="flex-1 border-2 border-jj-purple/30 rounded-lg p-3">
 					<div className="text-[10px] font-bold text-jj-purple uppercase tracking-wider mb-2">
-						After（split 後）
+						{t("splitSim.afterLabel")}
 					</div>
 					<div className="font-mono text-xs space-y-1">
 						<div className="flex items-center gap-2">
 							<span className="text-jj-blue font-bold">@</span>
 							<span className="text-jj-blue">
-								WC — remaining ({secondFiles.length} files)
+								WC — {t("splitSim.remaining")} ({secondFiles.length} files)
 							</span>
 						</div>
 						{secondFiles.length > 0 && (
@@ -227,7 +225,7 @@ function SplitSimulator({ files }: { files: FileEntry[] }) {
 						<div className="flex items-center gap-2 pl-4">
 							<span className="text-jj-purple">●</span>
 							<span className="text-jj-purple">
-								first commit ({firstFiles.length} files)
+								{t("splitSim.firstCommit")} ({firstFiles.length} files)
 							</span>
 						</div>
 						{firstFiles.length > 0 && (
@@ -250,20 +248,15 @@ function SplitSimulator({ files }: { files: FileEntry[] }) {
 
 			{/* Split flow explanation */}
 			<div className="bg-surface rounded-lg p-3 text-xs text-text-secondary space-y-1.5">
-				<div className="font-bold text-text-primary">jj split の流れ</div>
+				<div className="font-bold text-text-primary">{t("splitSim.flowTitle")}</div>
 				<ol className="list-decimal list-inside space-y-1 text-[11px]">
-					<li>
-						<code className="bg-surface-overlay px-1 rounded">jj split</code> を実行
-					</li>
-					<li>エディタが開き、最初のコミットに含める変更を選択</li>
-					<li>保存して閉じると、選択した変更が新コミットに、残りが WC に残る</li>
-					<li>
-						特定ファイルだけ分離: <code className="bg-surface-overlay px-1 rounded">jj split path/to/file</code>
-					</li>
+					<li dangerouslySetInnerHTML={{ __html: t("splitSim.step1") }} />
+					<li>{t("splitSim.step2")}</li>
+					<li>{t("splitSim.step3")}</li>
+					<li dangerouslySetInnerHTML={{ __html: t("splitSim.step4") }} />
 				</ol>
 				<div className="text-text-dim mt-2">
-					git では git reset HEAD~ → git add -p → git commit → git add -A → git commit
-					という複数ステップが必要。jj split は1コマンドで完結。
+					{t("splitSim.gitNote")}
 				</div>
 			</div>
 		</div>
@@ -280,6 +273,7 @@ export function CommitView({
 	diffSummary: FileEntry[];
 	status: JjStatus;
 }) {
+	const { t } = useTranslation("commit");
 	const [expandedOp, setExpandedOp] = useState<string | null>("split");
 
 	const wc = commits.find((c) => c.isWorkingCopy);
@@ -292,9 +286,9 @@ export function CommitView({
 	return (
 		<div className="h-full overflow-auto">
 			<div className="p-6 max-w-5xl">
-				<h2 className="text-lg font-bold mb-1">Commit</h2>
+				<h2 className="text-lg font-bold mb-1">{t("title")}</h2>
 				<p className="text-xs text-text-muted mb-6">
-					作業コピーの変更をどうするか。jj のコミットワークフローを理解する。
+					{t("subtitle")}
 				</p>
 
 				{/* WC status */}
@@ -337,7 +331,7 @@ export function CommitView({
 						</div>
 					) : (
 						<div className="text-xs text-text-dim">
-							変更なし（empty commit）
+							{t("wcStatus.noChanges")}
 						</div>
 					)}
 				</div>
@@ -345,7 +339,7 @@ export function CommitView({
 				{/* Operation cards */}
 				<div className="space-y-3 mb-8">
 					<h3 className="text-sm font-bold text-text-primary">
-						この変更をどうする？
+						{t("whatToDo")}
 					</h3>
 
 					<div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
@@ -374,7 +368,7 @@ export function CommitView({
 										</code>
 									</div>
 									<div className="text-xs text-text-secondary mb-2">
-										{op.description}
+										{t(`op.${op.id}.desc`)}
 									</div>
 									<div className="text-[10px] text-text-dim">
 										git: <code className="bg-surface-raised px-1 rounded">{op.gitEquivalent}</code>
@@ -412,12 +406,10 @@ export function CommitView({
 				{/* Split simulator */}
 				<div className="border-t border-border pt-6">
 					<h3 className="text-sm font-bold text-text-primary mb-1">
-						Split シミュレーター
+						{t("splitSim.title")}
 					</h3>
-					<p className="text-xs text-text-muted mb-4">
-						<code className="bg-surface-raised px-1 rounded">jj split</code> で WC の変更をどう分割するかを視覚的にシミュレーション。
-					</p>
-					<SplitSimulator files={diffSummary} />
+					<p className="text-xs text-text-muted mb-4" dangerouslySetInnerHTML={{ __html: t("splitSim.subtitle") }} />
+					<SplitSimulator files={diffSummary} t={t} />
 				</div>
 			</div>
 		</div>

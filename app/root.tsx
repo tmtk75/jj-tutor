@@ -11,11 +11,15 @@ import {
 	useNavigation,
 	useRevalidator,
 } from "react-router";
+import { useTranslation } from "react-i18next";
+import type { LoaderFunctionArgs } from "react-router";
 import { REPO_PATH } from "./server/config";
+import initI18n, { detectLocale } from "./i18n/i18n";
 import "./styles/app.css";
 
-export function loader() {
-	return { repoPath: REPO_PATH };
+export function loader({ request }: LoaderFunctionArgs) {
+	const locale = detectLocale(request);
+	return { repoPath: REPO_PATH, locale };
 }
 
 const NAV_ITEMS = [
@@ -114,8 +118,29 @@ function useNavigationLogger() {
 	}, [navigation.state, navigation.location]);
 }
 
+function LanguageSwitcher() {
+	const { i18n } = useTranslation();
+
+	const switchLanguage = () => {
+		const next = i18n.language === "ja" ? "en" : "ja";
+		document.cookie = `lang=${next}; path=/; max-age=31536000; SameSite=Lax`;
+		i18n.changeLanguage(next);
+	};
+
+	return (
+		<button
+			type="button"
+			onClick={switchLanguage}
+			className="text-[11px] font-mono font-bold px-2 py-0.5 rounded border border-border-strong text-text-secondary hover:bg-surface-raised transition-colors"
+		>
+			{i18n.language === "ja" ? "EN" : "JA"}
+		</button>
+	);
+}
+
 export default function Root() {
-	const { repoPath } = useLoaderData<typeof loader>();
+	const { repoPath, locale } = useLoaderData<typeof loader>();
+	const i18n = initI18n(locale);
 	const navigation = useNavigation();
 	usePolling();
 	useNavigationLogger();
@@ -123,7 +148,7 @@ export default function Root() {
 	const isNavigating = navigation.state === "loading";
 
 	return (
-		<html lang="ja">
+		<html lang={i18n.language}>
 			<head>
 				<meta charSet="utf-8" />
 				<meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -166,16 +191,19 @@ export default function Root() {
 								{repoPath}
 							</span>
 						</div>
-						{isNavigating && (
-							<span
-								className="text-[10px] text-jj-purple font-mono"
-								style={{
-									animation: "pulse-subtle 1.2s ease-in-out infinite",
-								}}
-							>
-								syncing...
-							</span>
-						)}
+						<div className="flex items-center gap-3">
+							{isNavigating && (
+								<span
+									className="text-[10px] text-jj-purple font-mono"
+									style={{
+										animation: "pulse-subtle 1.2s ease-in-out infinite",
+									}}
+								>
+									syncing...
+								</span>
+							)}
+							<LanguageSwitcher />
+						</div>
 					</header>
 
 					{/* Main layout */}

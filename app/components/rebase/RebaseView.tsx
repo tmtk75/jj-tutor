@@ -9,6 +9,7 @@ import {
 	type ReactFlowInstance,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { useTranslation } from "react-i18next";
 import type { JjCommit, RebaseMode, RebasePrediction } from "~/shared";
 import { CommitNode } from "../dag/CommitNode";
 import { layoutDag } from "../dag/dagLayout";
@@ -64,25 +65,10 @@ function shiftToTop(rf: ReactFlowInstance, containerEl: HTMLElement | null) {
 	}, 50);
 }
 
-const MODE_INFO: Record<
-	RebaseMode,
-	{ flag: string; label: string; desc: string }
-> = {
-	revision: {
-		flag: "-r",
-		label: "単一リビジョン",
-		desc: "選択したコミットだけを移動。子は元の親に再接続。",
-	},
-	subtree: {
-		flag: "-s",
-		label: "サブツリー",
-		desc: "コミットと子孫をまとめて移動。",
-	},
-	branch: {
-		flag: "-b",
-		label: "ブランチ",
-		desc: "ブランチ全体を移動（共通祖先まで遡る）。",
-	},
+const MODE_FLAGS: Record<RebaseMode, string> = {
+	revision: "-r",
+	subtree: "-s",
+	branch: "-b",
 };
 
 type SelectionStep = "source" | "dest";
@@ -129,6 +115,7 @@ export function RebaseView({
 	onSourceChange: (changeId: string) => void;
 	onDestChange: (changeId: string) => void;
 }) {
+	const { t } = useTranslation("rebase");
 	const [selectionStep, setSelectionStep] = useState<SelectionStep>(
 		selectedSource ? "dest" : "source",
 	);
@@ -227,8 +214,7 @@ export function RebaseView({
 				<div>
 					<h2 className="text-lg font-bold">Rebase</h2>
 					<p className="text-xs text-text-muted">
-						DAG 上のコミットをクリックして Source → Destination
-						を選択。結果を予測表示します。
+						{t("pageSubtitle")}
 					</p>
 				</div>
 			</div>
@@ -241,11 +227,8 @@ export function RebaseView({
 						Mode
 					</span>
 					{(
-						Object.entries(MODE_INFO) as [
-							RebaseMode,
-							(typeof MODE_INFO)[RebaseMode],
-						][]
-					).map(([mode, info]) => (
+						Object.entries(MODE_FLAGS) as [RebaseMode, string][]
+					).map(([mode, flag]) => (
 						<button
 							key={mode}
 							type="button"
@@ -255,9 +238,9 @@ export function RebaseView({
 									? "bg-jj-purple text-white"
 									: "bg-surface-raised text-text-muted hover:bg-surface-overlay"
 							}`}
-							title={info.desc}
+							title={t(`modeInfo.${mode}.desc`)}
 						>
-							{info.flag} {info.label}
+							{flag} {t(`modeInfo.${mode}.label`)}
 						</button>
 					))}
 				</div>
@@ -284,7 +267,7 @@ export function RebaseView({
 							</span>
 						) : (
 							<span className="text-text-dim italic">
-								クリックで選択
+								{t("selection.clickToSelect")}
 							</span>
 						)}
 						{sourceCommit && (
@@ -327,8 +310,8 @@ export function RebaseView({
 						) : (
 							<span className="text-text-dim italic">
 								{selectedSource
-									? "クリックで選択"
-									: "Source を先に選択"}
+									? t("selection.clickToSelect")
+									: t("selection.selectSourceFirst")}
 							</span>
 						)}
 						{destCommit && (
@@ -360,7 +343,7 @@ export function RebaseView({
 			{prediction?.validationError && (
 				<div className="bg-amber-500/8 border border-amber-500/20 rounded-lg px-4 py-2 mb-3 shrink-0">
 					<div className="text-xs text-amber-400">
-						{prediction.validationError}
+						{t(prediction.validationError, prediction.validationErrorParams)}
 					</div>
 				</div>
 			)}
@@ -378,7 +361,7 @@ export function RebaseView({
 						</div>
 					</div>
 					<div className="text-xs text-text-primary">
-						{prediction.explanation}
+						{t(prediction.explanation, prediction.explanationParams)}
 					</div>
 				</div>
 			)}
@@ -397,22 +380,22 @@ export function RebaseView({
 						<div className="flex items-center gap-4 mb-1 text-[10px] text-text-dim shrink-0">
 							<span className="flex items-center gap-1">
 								<span className="w-3 h-3 rounded border-2 border-green-400 inline-block" />
-								移動元 (source)
+								{t("legend.source")}
 							</span>
 							<span className="flex items-center gap-1">
 								<span className="w-3 h-3 rounded border-2 border-blue-400 inline-block" />
-								移動先 (dest)
+								{t("legend.dest")}
 							</span>
 							{afterGraph && (
 								<span className="flex items-center gap-1">
 									<span className="w-3 h-3 rounded border-2 border-purple-400 inline-block" />
-									移動後
+									{t("legend.moved")}
 								</span>
 							)}
 							<span className="ml-auto text-text-dim">
 								{selectionStep === "source"
-									? "コミットをクリックして Source を選択"
-									: "コミットをクリックして Destination を選択"}
+									? t("selection.selectSourceHint")
+									: t("selection.selectDestHint")}
 							</span>
 						</div>
 
@@ -423,7 +406,7 @@ export function RebaseView({
 									Before
 								</span>
 								<span className="text-[10px] text-text-dim">
-									(クリックで選択)
+									{t("selection.clickToSelectInDag")}
 								</span>
 							</div>
 							{afterGraph && (
@@ -535,6 +518,7 @@ function ConflictGuidance({
 	prediction: RebasePrediction | null;
 	existingConflicts: JjCommit[];
 }) {
+	const { t } = useTranslation("rebase");
 	const [expanded, setExpanded] = useState(false);
 
 	return (
@@ -547,16 +531,16 @@ function ConflictGuidance({
 			>
 				<div className="flex items-center gap-2">
 					<span className="text-amber-400 font-bold text-sm">
-						⚠
+						{"\u26A0"}
 					</span>
 					<span className="text-xs font-bold text-amber-400">
 						{prediction?.wouldConflict
-							? "コンフリクトが発生する可能性があります"
-							: `既存のコンフリクト (${existingConflicts.length} 件)`}
+							? t("conflict.wouldConflict")
+							: t("conflict.existingConflicts", { count: existingConflicts.length })}
 					</span>
 				</div>
 				<span className="text-xs text-amber-500">
-					{expanded ? "▼" : "▶"} 詳細
+					{expanded ? "\u25BC" : "\u25B6"} {t("conflict.detail")}
 				</span>
 			</button>
 
@@ -564,14 +548,14 @@ function ConflictGuidance({
 				<div className="px-4 pb-4 space-y-3 border-t border-amber-500/20">
 					{prediction?.conflictExplanation && (
 						<div className="text-xs text-amber-400 leading-relaxed whitespace-pre-line mt-3">
-							{prediction.conflictExplanation}
+							{t(prediction.conflictExplanation, prediction.conflictExplanationParams)}
 						</div>
 					)}
 
 					{existingConflicts.length > 0 && (
 						<div className="mt-3">
 							<div className="text-[10px] font-bold text-git-red mb-1">
-								未解消のコンフリクト:
+								{t("conflict.unresolvedConflicts")}
 							</div>
 							{existingConflicts.map((c) => (
 								<div
@@ -589,36 +573,37 @@ function ConflictGuidance({
 					<div className="grid grid-cols-2 gap-3">
 						<div className="bg-surface rounded p-2.5 border border-jj-purple/20">
 							<div className="text-[10px] font-bold text-jj-purple mb-1">
-								jj のコンフリクト
+								{t("conflict.jjConflict.title")}
 							</div>
 							<ul className="text-[10px] text-text-secondary space-y-0.5 leading-relaxed">
-								<li>
-									コンフリクトは
-									<strong>コミットに記録</strong>される
-								</li>
-								<li>作業が中断されない</li>
-								<li>後からいつでも解消可能</li>
-								<li>他のコミットに先に取り組める</li>
+								<li>{t("conflict.jjConflict.recordedInCommit", { interpolation: { escapeValue: false } }).split("<1>").map((part, i) => {
+									if (i === 0) return <span key={i}>{part}</span>;
+									const [bold, rest] = part.split("</1>");
+									return <span key={i}><strong>{bold}</strong>{rest}</span>;
+								})}</li>
+								<li>{t("conflict.jjConflict.noInterruption")}</li>
+								<li>{t("conflict.jjConflict.resolveAnytime")}</li>
+								<li>{t("conflict.jjConflict.workOnOther")}</li>
 							</ul>
 						</div>
 						<div className="bg-surface rounded p-2.5 border border-git-orange/20">
 							<div className="text-[10px] font-bold text-git-orange mb-1">
-								git のコンフリクト
+								{t("conflict.gitConflict.title")}
 							</div>
 							<ul className="text-[10px] text-text-secondary space-y-0.5 leading-relaxed">
-								<li>
-									rebase が<strong>途中で停止</strong>する
-								</li>
-								<li>解消するまで次に進めない</li>
+								<li>{t("conflict.gitConflict.rebaseStops", { interpolation: { escapeValue: false } }).split("<1>").map((part, i) => {
+									if (i === 0) return <span key={i}>{part}</span>;
+									const [bold, rest] = part.split("</1>");
+									return <span key={i}><strong>{bold}</strong>{rest}</span>;
+								})}</li>
+								<li>{t("conflict.gitConflict.mustResolve")}</li>
 								<li>
 									<code className="bg-surface-raised px-1 rounded">
 										git rebase --continue
 									</code>{" "}
-									を繰り返す
+									{t("conflict.gitConflict.continueNeeded")}
 								</li>
-								<li>
-									複数コミットだと何度も解消が必要
-								</li>
+								<li>{t("conflict.gitConflict.multipleResolves")}</li>
 							</ul>
 						</div>
 					</div>
@@ -626,7 +611,7 @@ function ConflictGuidance({
 					{/* Resolution steps */}
 					<div>
 						<div className="text-[10px] font-bold text-amber-400 mb-1.5">
-							解消手順
+							{t("conflict.resolution.title")}
 						</div>
 						<div className="space-y-1.5">
 							<div className="flex items-start gap-2">
@@ -638,7 +623,7 @@ function ConflictGuidance({
 										jj new {"<conflicted>"}
 									</code>
 									<span className="text-text-dim ml-1">
-										コンフリクトのあるコミットの上に移動
+										{t("conflict.resolution.step1Hint")}
 									</span>
 								</div>
 							</div>
@@ -647,7 +632,7 @@ function ConflictGuidance({
 									2
 								</span>
 								<div className="text-[10px] text-text-primary">
-									ファイル内のコンフリクトマーカーを編集して解消
+									{t("conflict.resolution.step2")}
 								</div>
 							</div>
 							<div className="flex items-start gap-2">
@@ -659,7 +644,7 @@ function ConflictGuidance({
 										jj squash
 									</code>
 									<span className="text-text-dim ml-1">
-										修正をコンフリクトコミットに統合
+										{t("conflict.resolution.step3Hint")}
 									</span>
 								</div>
 							</div>
@@ -669,26 +654,21 @@ function ConflictGuidance({
 					{/* Conflict markers */}
 					<div>
 						<div className="text-[10px] font-bold text-amber-400 mb-1">
-							jj のコンフリクトマーカー
+							{t("conflict.markers.title")}
 						</div>
 						<pre className="text-[10px] bg-surface-card rounded p-2 font-mono text-text-primary leading-relaxed border border-amber-500/20">
-							{`<<<<<<<
-左側の変更（移動元の内容）
-%%%%%%%
-ベースからの差分
->>>>>>>
-右側の変更（移動先の内容）`}
+							{`<<<<<<<\n${t("conflict.markers.leftChange")}\n%%%%%%%\n${t("conflict.markers.baseDiff")}\n>>>>>>>\n${t("conflict.markers.rightChange")}`}
 						</pre>
 						<div className="text-[10px] text-text-dim mt-1">
-							※ git の{" "}
+							{t("conflict.markers.note")}{" "}
 							<code className="bg-surface-raised px-0.5 rounded">
 								=======
 							</code>{" "}
-							区切りと異なり、jj は diff ベース（
+							{t("conflict.markers.noteDiff")}
 							<code className="bg-surface-raised px-0.5 rounded">
 								%%%%%%%
 							</code>{" "}
-							セクション）
+							{t("conflict.markers.noteSuffix")}
 						</div>
 					</div>
 				</div>

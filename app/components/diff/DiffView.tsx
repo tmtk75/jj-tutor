@@ -1,5 +1,6 @@
 import { useFetcher } from "react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { JjCommit, JjOperation } from "~/shared";
 
 // --- Types ---
@@ -272,16 +273,19 @@ function DiffContent({
 	viewMode,
 	loading,
 	emptyMessage,
+	loadingMessage,
 }: {
 	parsed: FileDiff[];
 	viewMode: ViewMode;
 	loading?: boolean;
 	emptyMessage: string;
+	loadingMessage?: string;
 }) {
+	const { t } = useTranslation("diff");
 	if (loading) {
 		return (
 			<div className="flex items-center justify-center h-24 text-text-dim text-xs">
-				読み込み中...
+				{loadingMessage ?? t("loading")}
 			</div>
 		);
 	}
@@ -373,6 +377,7 @@ function EvologDiffDetail({
 	to: string;
 	viewMode: ViewMode;
 }) {
+	const { t } = useTranslation("diff");
 	const fetcher = useFetcher<{ diffContent: string }>();
 
 	useEffect(() => {
@@ -389,7 +394,7 @@ function EvologDiffDetail({
 	if (fetcher.state === "loading") {
 		return (
 			<div className="text-[10px] text-text-dim py-2 px-2">
-				読み込み中...
+				{t("loading")}
 			</div>
 		);
 	}
@@ -397,7 +402,7 @@ function EvologDiffDetail({
 	if (parsed.length === 0) {
 		return (
 			<div className="text-[10px] text-text-dim py-2 px-2 italic">
-				差分なし
+				{t("noDiff")}
 			</div>
 		);
 	}
@@ -406,7 +411,7 @@ function EvologDiffDetail({
 		<DiffContent
 			parsed={parsed}
 			viewMode={viewMode}
-			emptyMessage="差分なし"
+			emptyMessage={t("noDiff")}
 		/>
 	);
 }
@@ -446,6 +451,7 @@ export function DiffView({
 	operations: JjOperation[];
 	onChangeRev: (rev: string) => void;
 }) {
+	const { t } = useTranslation("diff");
 	const revParsed = useMemo(() => parseDiff(diffContent), [diffContent]);
 	const [viewMode, setViewMode] = useState<ViewMode>("unified");
 
@@ -489,7 +495,7 @@ export function DiffView({
 				<div className="flex items-center gap-3">
 					<h2 className="text-lg font-bold tracking-tight">Diff</h2>
 					<span className="text-xs text-text-dim">
-						revision の差分と、operation / evolog の関係
+						{t("pageSubtitle")}
 					</span>
 					<div className="ml-auto flex bg-surface-raised rounded border border-border text-[11px] overflow-hidden">
 						<button
@@ -525,11 +531,10 @@ export function DiffView({
 					<div className="px-4 py-3 border-b border-border bg-jj-purple/8 shrink-0">
 						<div className="flex items-center gap-2 mb-1.5">
 							<span className="text-xs font-bold text-jj-purple">Revision Diff</span>
-							<span className="text-[10px] text-text-dim">change の変更内容</span>
+							<span className="text-[10px] text-text-dim">{t("revisionDiff.title")}</span>
 						</div>
 						<p className="text-[11px] text-text-muted leading-relaxed mb-2">
-							各 change が親からどう変わったかを表示。
-							jj は自動スナップショットするため、常に最新の diff が見える。
+							{t("revisionDiff.description")}
 						</p>
 						<div className="flex items-center gap-2">
 							<select
@@ -554,10 +559,10 @@ export function DiffView({
 						</div>
 						{selectedRevCommit?.divergent && (
 							<div className="bg-amber-500/8 border border-amber-500/20 rounded p-2 mt-2 text-[11px] text-amber-300 leading-relaxed">
-								<strong>Divergent Change (??)</strong>: この change ID は複数のコミットに分岐しています。
-								<code className="bg-amber-500/15 px-1 rounded font-mono mx-0.5">jj abandon</code> で不要な方を捨てるか、
-								<code className="bg-amber-500/15 px-1 rounded font-mono mx-0.5">jj op restore</code> で分岐前に戻してください。
-								<a href="/faq#divergent" className="text-amber-400 underline hover:text-amber-300 ml-1">詳細はFAQへ →</a>
+								<strong>{t("divergentWarning.title")}</strong>: {t("divergentWarning.description")}
+								<code className="bg-amber-500/15 px-1 rounded font-mono mx-0.5">jj abandon</code> {t("divergentWarning.abandonHint")}
+								<code className="bg-amber-500/15 px-1 rounded font-mono mx-0.5">jj op restore</code> {t("divergentWarning.opRestoreHint")}
+								<a href="/faq#divergent" className="text-amber-400 underline hover:text-amber-300 ml-1">{t("divergentWarning.faqLink")}</a>
 							</div>
 						)}
 						<div className="flex flex-wrap gap-1.5 mt-2">
@@ -572,7 +577,7 @@ export function DiffView({
 						<DiffContent
 							parsed={revParsed}
 							viewMode={viewMode}
-							emptyMessage="変更なし（empty commit）"
+							emptyMessage={t("emptyCommit")}
 						/>
 					</div>
 				</div>
@@ -584,9 +589,8 @@ export function DiffView({
 							<span className="text-xs font-bold text-git-orange">Operation & Evolution</span>
 						</div>
 						<p className="text-[11px] text-text-muted leading-relaxed mb-2">
-							<strong>op log</strong> = 全操作の履歴。
-							<strong>evolog</strong> = 特定 change の進化履歴（op log のサブセット）。
-							change を選ぶと、その change に影響した op がハイライトされる。
+							<strong>op log</strong> = {t("operationEvolution.opLogDescription")}
+							<strong>evolog</strong> = {t("operationEvolution.evologDescription")}
 						</p>
 						<div className="flex flex-wrap gap-1.5 mb-3">
 							<CopyableCmd command="jj op log" />
@@ -628,7 +632,7 @@ export function DiffView({
 						</div>
 						{evolog.length > 0 && (
 							<div className="text-[10px] text-text-dim mt-1">
-								{evolog.length} evolog entries / {operations.length} operations
+								{t("operationEvolution.evologEntries", { count: evolog.length, opCount: operations.length })}
 							</div>
 						)}
 					</div>
@@ -637,24 +641,24 @@ export function DiffView({
 					<div className="flex-1 overflow-auto">
 						{evoLoading ? (
 							<div className="flex items-center justify-center h-24 text-text-dim text-xs">
-								読み込み中...
+								{t("loading")}
 							</div>
 						) : !selectedChangeId || evolog.length === 0 ? (
 							<div className="p-5">
 								{!selectedChangeId ? (
 									<div className="text-text-dim text-xs text-center mb-4">
-										change を選択して Load すると、op log と evolog の関係を表示
+										{t("operationEvolution.selectHint")}
 									</div>
 								) : null}
 								<div className="bg-surface rounded-lg border border-border p-4 text-[11px] text-text-muted leading-relaxed">
-									<div className="font-semibold text-text-primary mb-2">op log vs evolog</div>
+									<div className="font-semibold text-text-primary mb-2">{t("operationEvolution.opLogVsEvolog.title")}</div>
 									<div className="space-y-1">
-										<div><strong>op log</strong>: リポジトリへの全操作（new, commit, snapshot...）</div>
-										<div><strong>evolog</strong>: 特定 change の進化履歴。op log を1つの change でフィルタしたもの</div>
+										<div><strong>op log</strong>: {t("operationEvolution.opLogVsEvolog.opLog")}</div>
+										<div><strong>evolog</strong>: {t("operationEvolution.opLogVsEvolog.evolog")}</div>
 									</div>
 									<div className="mt-3 font-mono text-[10px] bg-surface-card rounded border border-border p-2">
-										<div>$ jj op log      <span className="text-text-dim"># 全操作</span></div>
-										<div>$ jj evolog -r @  <span className="text-text-dim"># @ の履歴だけ</span></div>
+										<div>$ jj op log      <span className="text-text-dim">{t("operationEvolution.opLogVsEvolog.opLogComment")}</span></div>
+										<div>$ jj evolog -r @  <span className="text-text-dim">{t("operationEvolution.opLogVsEvolog.evologComment")}</span></div>
 									</div>
 								</div>
 							</div>
@@ -723,7 +727,7 @@ export function DiffView({
 												)}
 												{i === evolog.length - 1 && (
 													<div className="ml-4 mt-1 text-[9px] text-text-dim italic">
-														(最初のスナップショット)
+														{t("firstSnapshot")}
 													</div>
 												)}
 											</div>
@@ -749,13 +753,12 @@ export function DiffView({
 								<div className="px-4 py-3 border-t border-border bg-surface/30">
 									<div className="text-[10px] text-text-muted leading-relaxed space-y-1">
 										<div>
-											<strong>evolog</strong> = この change の進化履歴。
-											ファイルを変更するたびに commit ID が更新される（change ID は不変）。
+											<strong>evolog</strong> = {t("evologLegend.description")}
 										</div>
 										<div>
-											各エントリは operation（jj の操作記録）に紐付く。
-											<strong>op log</strong> にはリポ全体の操作が記録されるが、
-											evolog はそのうち<em>この change に影響した操作だけ</em>をフィルタしたもの。
+											{t("evologLegend.opRelation")}
+											<strong>op log</strong> {t("evologLegend.opLogNote")}
+											<em>{t("evologLegend.filterNote")}</em>{t("evologLegend.filterSuffix")}
 										</div>
 									</div>
 									<div className="flex flex-wrap gap-1.5 mt-2">

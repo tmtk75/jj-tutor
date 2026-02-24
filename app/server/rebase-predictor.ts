@@ -224,32 +224,34 @@ export function predictRebase(
 	if (!source) {
 		return {
 			...basePrediction,
-			validationError: `Source "${sourceChangeId}" が見つかりません。`,
+			validationError: "validation.sourceNotFound",
+			validationErrorParams: { changeId: sourceChangeId },
 		};
 	}
 	if (!dest) {
 		return {
 			...basePrediction,
-			validationError: `Destination "${destChangeId}" が見つかりません。`,
+			validationError: "validation.destNotFound",
+			validationErrorParams: { changeId: destChangeId },
 		};
 	}
 	if (source.changeId === dest.changeId) {
 		return {
 			...basePrediction,
-			validationError:
-				"Source と Destination が同じです。移動の必要はありません。",
+			validationError: "validation.sameSrcDest",
 		};
 	}
 	if (source.immutable) {
 		return {
 			...basePrediction,
-			validationError: `${source.changeId.slice(0, 8)} は immutable です。rebase できません。`,
+			validationError: "validation.immutable",
+			validationErrorParams: { changeId: source.changeId.slice(0, 8) },
 		};
 	}
 	if (source.changeId === "zzzzzzzzzzzz") {
 		return {
 			...basePrediction,
-			validationError: "root コミットは rebase できません。",
+			validationError: "validation.rootCommit",
 		};
 	}
 
@@ -259,8 +261,7 @@ export function predictRebase(
 		if (descendants.has(dest.commitId)) {
 			return {
 				...basePrediction,
-				validationError:
-					"Destination が Source の子孫です。サイクルが発生するため rebase できません。",
+				validationError: "validation.cycle",
 			};
 		}
 	}
@@ -270,25 +271,28 @@ export function predictRebase(
 
 	let afterCommits: JjCommit[];
 	let explanation: string;
+	const srcShortId = source.changeId.slice(0, 8);
+	const dstShortId = dest.changeId.slice(0, 8);
+	const explanationParams = { source: srcShortId, dest: dstShortId };
 
 	switch (mode) {
 		case "revision": {
 			afterCommits = predictRevision(source, dest, commits);
 			explanation = alreadyChild
-				? `${source.changeId.slice(0, 8)} は既に ${dest.changeId.slice(0, 8)} の子です。変化はありません。`
-				: `${source.changeId.slice(0, 8)} を ${dest.changeId.slice(0, 8)} の上に移動します。元の子コミットは ${source.changeId.slice(0, 8)} の親に再接続されます。`;
+				? "predict.revision.alreadyChild"
+				: "predict.revision.move";
 			break;
 		}
 		case "subtree": {
 			afterCommits = predictSubtree(source, dest, commits);
 			explanation = alreadyChild
-				? `${source.changeId.slice(0, 8)} は既に ${dest.changeId.slice(0, 8)} の子です。変化はありません。`
-				: `${source.changeId.slice(0, 8)} とその子孫をまとめて ${dest.changeId.slice(0, 8)} の上に移動します。サブツリー内の親子関係は保持されます。`;
+				? "predict.subtree.alreadyChild"
+				: "predict.subtree.move";
 			break;
 		}
 		case "branch": {
 			afterCommits = predictBranch(source, dest, commits);
-			explanation = `${source.changeId.slice(0, 8)} を含むブランチ全体を ${dest.changeId.slice(0, 8)} の上に移動します。共通祖先まで遡って移動します。`;
+			explanation = "predict.branch.move";
 			break;
 		}
 	}
@@ -301,14 +305,19 @@ export function predictRebase(
 		!isAncestor(source.commitId, dest.commitId, commits);
 
 	const conflictExplanation = wouldConflict
-		? `${source.changeId.slice(0, 8)} と ${dest.changeId.slice(0, 8)} は祖先・子孫の関係にないため、同じファイルを変更している場合にコンフリクトが発生する可能性があります。\n\n※ これはヒューリスティックな予測です。実際のコンフリクト発生はファイル内容に依存します。`
+		? "predict.conflictExplanation"
+		: undefined;
+	const conflictExplanationParams = wouldConflict
+		? { source: srcShortId, dest: dstShortId }
 		: undefined;
 
 	return {
 		...basePrediction,
 		afterCommits,
 		explanation,
+		explanationParams,
 		wouldConflict,
 		conflictExplanation,
+		conflictExplanationParams,
 	};
 }

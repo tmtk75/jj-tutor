@@ -168,10 +168,8 @@ const predictors: Record<string, PredictFn> = {
 
 		return {
 			afterCommits,
-			explanation:
-				"新しい空のワーキングコピーが作成され、現在の WC が親になります。現在の変更はそのまま親コミットとして残ります。",
-			gitEquivalent:
-				'git add -A && git commit -m "..."',
+			explanation: "predict.jjNew",
+			gitEquivalent: "predict.jjNew.gitEquiv",
 			gitBeforeCommits: gitBefore,
 			gitAfterCommits: gitAfter,
 		};
@@ -236,10 +234,8 @@ const predictors: Record<string, PredictFn> = {
 
 		return {
 			afterCommits,
-			explanation:
-				"2つ前のコミットから分岐して新しい WC を作成。元の WC はそのまま残るので、後で jj edit で戻れる。bookmark を付けなくても change ID で追跡できる。",
-			gitEquivalent:
-				"git stash && git checkout -b feature HEAD~2",
+			explanation: "predict.jjNewBranch",
+			gitEquivalent: "predict.jjNewBranch.gitEquiv",
 			gitBeforeCommits: gitBefore,
 			gitAfterCommits: gitAfter,
 		};
@@ -281,9 +277,8 @@ const predictors: Record<string, PredictFn> = {
 
 		return {
 			afterCommits,
-			explanation:
-				"jj new と似ていますが、同時にコミットメッセージが設定されます。現在の WC に説明が付き、新しい空の WC が作成されます。",
-			gitEquivalent: 'git add -A && git commit -m "message"',
+			explanation: "predict.jjCommit",
+			gitEquivalent: "predict.jjCommit.gitEquiv",
 			gitBeforeCommits: gitBefore,
 			gitAfterCommits: gitAfter,
 		};
@@ -333,9 +328,8 @@ const predictors: Record<string, PredictFn> = {
 
 		return {
 			afterCommits,
-			explanation:
-				"WC の変更が親コミットに吸収されます。WC は空になりますが、同じ change ID を保持します。",
-			gitEquivalent: "git add -A && git commit --amend",
+			explanation: "predict.jjSquash",
+			gitEquivalent: "predict.jjSquash.gitEquiv",
 			gitBeforeCommits: gitBefore,
 			gitAfterCommits: gitAfter,
 		};
@@ -360,9 +354,8 @@ const predictors: Record<string, PredictFn> = {
 
 		return {
 			afterCommits,
-			explanation:
-				"現在の WC にブックマーク 'main' が設定されます。git の 'git branch main' に相当しますが、jj ではブックマークは自動で動きません。",
-			gitEquivalent: "git branch main HEAD",
+			explanation: "predict.jjBookmarkSet",
+			gitEquivalent: "predict.jjBookmarkSet.gitEquiv",
 			gitBeforeCommits: gitBefore,
 			gitAfterCommits: gitAfter,
 		};
@@ -413,10 +406,8 @@ const predictors: Record<string, PredictFn> = {
 
 		return {
 			afterCommits,
-			explanation:
-				"現在の WC と親の間に新しいコミットが挿入されます。新しいコミットが WC になり、元の WC はその子になります。",
-			gitEquivalent:
-				"git rebase -i で途中にコミットを挿入（複数ステップ必要）",
+			explanation: "predict.jjNewInsertBefore",
+			gitEquivalent: "predict.jjNewInsertBefore.gitEquiv",
 			gitBeforeCommits: gitBefore,
 			gitAfterCommits: gitAfter,
 		};
@@ -454,9 +445,8 @@ const predictors: Record<string, PredictFn> = {
 
 		return {
 			afterCommits,
-			explanation:
-				"WC のコミットメッセージが変更されます。DAG の構造は変わりません。change ID も commit ID も変わりません（内容が同じため）。",
-			gitEquivalent: "git commit --amend -m 'message'（hash が変わる）",
+			explanation: "predict.jjDescribe",
+			gitEquivalent: "predict.jjDescribe.gitEquiv",
 			gitBeforeCommits: gitBefore,
 			gitAfterCommits: gitAfter,
 		};
@@ -485,10 +475,9 @@ const predictors: Record<string, PredictFn> = {
 		return {
 			afterCommits: prevCommits ?? commits,
 			explanation: prevCommits
-				? "直前の操作が取り消され、リポジトリが1つ前の状態に戻ります。After は実際の1つ前の operation の状態です。"
-				: "直前の操作が取り消されます（前の状態の取得に失敗したため Before と同じ表示です）。",
-			gitEquivalent:
-				"git reflog → git reset --hard <hash>",
+				? "predict.jjUndo"
+				: "predict.jjUndo.fallback",
+			gitEquivalent: "predict.jjUndo.gitEquiv",
 			gitBeforeCommits: gitBefore,
 			gitAfterCommits: gitAfter,
 		};
@@ -520,10 +509,8 @@ const predictors: Record<string, PredictFn> = {
 
 		return {
 			afterCommits,
-			explanation:
-				"作業コピーの全ファイルが親コミットの状態に戻ります（WC が empty になる）。change ID は変わらず、DAG 構造も変わりません。⚠️ colocate モードでは git の staging area もリセットされます。",
-			gitEquivalent:
-				"git restore .（unstaged のみ。staged は残る）",
+			explanation: "predict.jjRestore",
+			gitEquivalent: "predict.jjRestore.gitEquiv",
 			gitBeforeCommits: gitBefore,
 			gitAfterCommits: gitAfter,
 		};
@@ -568,10 +555,8 @@ const predictors: Record<string, PredictFn> = {
 
 		return {
 			afterCommits,
-			explanation:
-				"ワーキングコピーが親コミットに移動します。親を直接編集でき、元の WC は子として残ります。作業が終わったら jj new で戻れます。",
-			gitEquivalent:
-				"git stash && git checkout HEAD~（detached HEAD）",
+			explanation: "predict.jjEditParent",
+			gitEquivalent: "predict.jjEditParent.gitEquiv",
 			gitBeforeCommits: gitBefore,
 			gitAfterCommits: gitAfter,
 		};

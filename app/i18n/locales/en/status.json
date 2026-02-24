@@ -1,0 +1,162 @@
+{
+	"title": "Working Copy Status",
+	"jjStatus": "jj status",
+	"gitStatusLabel": "git status",
+	"stagingNotice": "No staging needed. Changes are automatically included in this commit when you save files.",
+	"gitStagingNotice": "Three stages: git add → staged → git commit. Direct git operations are not recommended as jj manages them internally.",
+	"noChangesJj": "No changes in working copy",
+	"noChangesGit": "No changes (clean)",
+	"divergent": {
+		"title": "Divergent Change Detected",
+		"desc": "The same change ID has diverged into multiple commits:",
+		"explanation": "This commonly occurs when describe and auto-snapshot happen simultaneously. Git has no equivalent concept (jj-specific state).",
+		"detailLink": "Details on causes and resolution →",
+		"method1Title": "Method 1: Abandon the orphaned one",
+		"method1Step1": "1. Check <code>jj log</code> to find which one is an ancestor of @ (keep that one)",
+		"method1Step2": "2. Verify with <code>jj diff --from @ --to COMMIT_ID</code> (if no + lines, WC has everything)",
+		"method1Step3": "3. If there are + lines, import with <code>jj restore --from COMMIT_ID path</code>",
+		"method1Step4": "4. <code>jj abandon -r COMMIT_ID</code> (use commit ID, not change ID — that would abandon both)",
+		"method2Title": "Method 2: Restore to before the divergence",
+		"method2Desc": "Find the operation before divergence in op log and restore to that point. Reliable, but all subsequent operations are also rolled back."
+	},
+	"tips": {
+		"title": "What you can do now",
+		"unstaged": {
+			"title": "There are unstaged changes",
+			"gitRevert": "To revert in git",
+			"gitRestorePath": "Discard unstaged changes. Staged changes remain.",
+			"gitRestoreStaged": "Unstage changes (the changes themselves remain).",
+			"jjRevert": "To revert in jj",
+			"jjRestorePath": "Restore the specified file to the parent commit's state. No staged/unstaged distinction, so this is all you need.",
+			"jjRestoreAll": "Restore all files to the parent's state (equivalent to git checkout .)."
+		},
+		"staged": {
+			"title": "Staged changes only",
+			"gitConfirm": "To commit in git",
+			"gitConfirmDesc": "Commit staged changes.",
+			"jjNote": "In jj",
+			"jjNoteDesc": "Already committed in jj (working copy = commit). To move to the next commit:",
+			"jjNewDesc": "Finalize the current working copy and create a new empty commit."
+		},
+		"wcChanges": {
+			"title": "Working copy has changes ({{count}} files)",
+			"moveForward": "Move forward",
+			"moveForwardDesc": "Finalize changes and create a new commit",
+			"splitPart": "Split some out",
+			"splitPartDesc": "Interactively split the commit",
+			"squashToParent": "Squash into parent",
+			"squashToParentDesc": "Absorb changes into the parent commit"
+		},
+		"undoVsRestore": {
+			"title": "jj undo vs jj restore",
+			"undoLabel": "Undo an operation",
+			"undoDesc": "Undo the entire previous <strong>jj command (operation)</strong>. Rolls back at the operation level: rebase, describe, new, etc.",
+			"undoExample1": "$ jj rebase -r X -d Y",
+			"undoExample2": "# Oops, that was wrong",
+			"undoExample3": "$ jj undo",
+			"undoExample4": "# Back to the state before rebase",
+			"undoGit": "git equivalent: git reflog + git reset",
+			"restoreLabel": "Restore file contents",
+			"restoreDesc": "Restore specific <strong>file contents</strong> from another revision. Only file contents change — the operation log is unaffected.",
+			"restoreExample1": "$ jj restore --from @- src/app.ts",
+			"restoreExample2": "# Only app.ts is restored to parent's state",
+			"restoreExample3": "$ jj restore --from @-",
+			"restoreExample4": "# Restore all files to parent's state",
+			"restoreGit": "git equivalent: git restore / git checkout --"
+		}
+	},
+	"opComp": {
+		"title": "Operation Comparison: If you do this, this happens",
+		"subtitle": "How jj and git commands differ for the same task. jj simplifies complex git operations.",
+		"0": {
+			"label": "Record changes",
+			"jj": {
+				"desc": "Save files → automatically reflected in the commit. No staging needed. jj always takes snapshots."
+			},
+			"git": {
+				"desc": "Stage with git add → finalize with git commit. Two steps required."
+			}
+		},
+		"1": {
+			"label": "Create a new commit",
+			"jj": {
+				"desc": "Create an empty commit on top of the current working copy. In git, empty commits require --allow-empty."
+			},
+			"git": {
+				"desc": "Empty commits are a special operation. Normally you stage changes then commit."
+			}
+		},
+		"2": {
+			"label": "Split a commit",
+			"jj": {
+				"desc": "Interactively split one commit into two. Select changes interactively."
+			},
+			"git": {
+				"desc": "rebase -i to edit → reset → partial add → multiple commits. Many steps required."
+			}
+		},
+		"3": {
+			"label": "Squash into previous commit",
+			"jj": {
+				"desc": "Merge working copy changes into the parent commit. Equivalent to git's amend + add."
+			},
+			"git": {
+				"desc": "Stage with add → rewrite the last commit with --amend."
+			}
+		},
+		"4": {
+			"label": "Edit a past commit",
+			"jj": {
+				"desc": "Jump directly to a past commit and edit it. The working copy becomes that commit."
+			},
+			"git": {
+				"desc": "Mark as edit in rebase -i → stop at that commit → modify → git rebase --continue."
+			}
+		},
+		"5": {
+			"label": "Rebase",
+			"jj": {
+				"desc": "Move any commit to a different parent. Conflicts are recorded as commits without interrupting (can be resolved later)."
+			},
+			"git": {
+				"desc": "Stops on conflict. Must resolve → git rebase --continue repeatedly."
+			}
+		},
+		"6": {
+			"label": "Create a branch",
+			"jj": {
+				"desc": "bookmark = git's branch. In jj, you can develop without branches (anonymous branch style)."
+			},
+			"git": {
+				"desc": "Branches are essential. Without a branch, commits become orphaned (detached HEAD)."
+			}
+		},
+		"7": {
+			"label": "Merge",
+			"jj": {
+				"desc": "Create a new commit with multiple parents. jj new accepts any number of parents."
+			},
+			"git": {
+				"desc": "Merge two branches. Conflicts must be resolved. Octopus merge is possible but rare."
+			}
+		},
+		"8": {
+			"label": "Revert file changes",
+			"jj": {
+				"desc": "Restore a file to the parent commit's state. For all files: jj restore --from @-. One command since there's no staging concept."
+			},
+			"git": {
+				"desc": "Reverts unstaged changes. To revert staged, you need git restore --staged first. Two steps."
+			}
+		},
+		"9": {
+			"label": "Undo changes (operation-level)",
+			"jj": {
+				"desc": "Undo at the operation level. jj undo reverts the last operation. op restore restores to any point in time."
+			},
+			"git": {
+				"desc": "reset (revert history), revert (new commit to undo), reflog (restore from reference log). Different tools for different needs."
+			}
+		}
+	}
+}

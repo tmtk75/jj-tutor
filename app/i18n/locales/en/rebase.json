@@ -1,0 +1,86 @@
+{
+	"pageSubtitle": "Click commits on the DAG to select Source → Destination. Predicts the result.",
+	"modeInfo": {
+		"revision": {
+			"label": "Single revision",
+			"desc": "Move only the selected commit. Children reconnect to original parent."
+		},
+		"subtree": {
+			"label": "Subtree",
+			"desc": "Move the commit and all its descendants together."
+		},
+		"branch": {
+			"label": "Branch",
+			"desc": "Move the entire branch (traces back to common ancestor)."
+		}
+	},
+	"selection": {
+		"clickToSelect": "Click to select",
+		"selectSourceFirst": "Select Source first",
+		"selectSourceHint": "Click a commit to select Source",
+		"selectDestHint": "Click a commit to select Destination",
+		"clickToSelectInDag": "(click to select)"
+	},
+	"legend": {
+		"source": "Source",
+		"dest": "Destination",
+		"moved": "After move"
+	},
+	"conflict": {
+		"wouldConflict": "Conflicts may occur",
+		"existingConflicts": "Existing conflicts ({{count}})",
+		"unresolvedConflicts": "Unresolved conflicts:",
+		"detail": "Details",
+		"jjConflict": {
+			"title": "jj conflicts",
+			"recordedInCommit": "Conflicts are <1>recorded in the commit</1>",
+			"noInterruption": "Work is not interrupted",
+			"resolveAnytime": "Can be resolved at any time",
+			"workOnOther": "Can work on other commits first"
+		},
+		"gitConflict": {
+			"title": "git conflicts",
+			"rebaseStops": "Rebase <1>stops midway</1>",
+			"mustResolve": "Cannot proceed until resolved",
+			"continueNeeded": "must be repeated",
+			"multipleResolves": "Multiple commits require multiple resolutions"
+		},
+		"resolution": {
+			"title": "Resolution steps",
+			"step1Hint": "Move to the conflicted commit",
+			"step2": "Edit conflict markers in the files to resolve",
+			"step3Hint": "Squash the fix into the conflicted commit"
+		},
+		"markers": {
+			"title": "jj conflict markers",
+			"leftChange": "Left side changes (source content)",
+			"baseDiff": "Diff from base",
+			"rightChange": "Right side changes (destination content)",
+			"note": "Unlike git's",
+			"noteDiff": "separator, jj uses a diff-based approach (",
+			"noteSuffix": "section)"
+		}
+	},
+	"predict": {
+		"revision": {
+			"move": "Moves {{source}} on top of {{dest}}. Original child commits are reconnected to {{source}}'s parent.",
+			"alreadyChild": "{{source}} is already a child of {{dest}}. No change."
+		},
+		"subtree": {
+			"move": "Moves {{source}} and its descendants together on top of {{dest}}. Parent-child relationships within the subtree are preserved.",
+			"alreadyChild": "{{source}} is already a child of {{dest}}. No change."
+		},
+		"branch": {
+			"move": "Moves the entire branch containing {{source}} on top of {{dest}}. Traces back to the common ancestor."
+		},
+		"conflictExplanation": "{{source}} and {{dest}} are not in an ancestor-descendant relationship, so conflicts may occur if they modify the same files.\n\nNote: This is a heuristic prediction. Actual conflicts depend on file contents."
+	},
+	"validation": {
+		"sourceNotFound": "Source \"{{changeId}}\" not found.",
+		"destNotFound": "Destination \"{{changeId}}\" not found.",
+		"sameSrcDest": "Source and Destination are the same. No move needed.",
+		"immutable": "{{changeId}} is immutable. Cannot rebase.",
+		"rootCommit": "Cannot rebase the root commit.",
+		"cycle": "Destination is a descendant of Source. Cannot rebase as it would create a cycle."
+	}
+}

@@ -90,6 +90,7 @@ export interface WhatIfPrediction {
 	beforeCommits: JjCommit[];
 	afterCommits: JjCommit[];
 	explanation: string;
+	explanationParams?: Record<string, string>;
 	gitEquivalent: string;
 	gitDetail?: GitEquivalent;
 	gitBeforeCommits: GitCommit[];
@@ -106,9 +107,12 @@ export interface RebasePrediction {
 	beforeCommits: JjCommit[];
 	afterCommits: JjCommit[];
 	explanation: string;
+	explanationParams?: Record<string, string>;
 	wouldConflict: boolean;
 	conflictExplanation?: string;
+	conflictExplanationParams?: Record<string, string>;
 	validationError?: string;
+	validationErrorParams?: Record<string, string>;
 	gitEquivalent: string;
 }
 

@@ -1,0 +1,216 @@
+{
+	"pageTitle": "FAQ: Common jj Questions",
+	"pageDescription": "Common stumbling points for git users getting started with jj.",
+	"relatedCommands": "Related Commands",
+	"gitComparisonTitle": "Git Comparison",
+	"gitDifference": "differences",
+	"items": {
+		"0": {
+			"q": "What's the difference between jj undo and jj restore?",
+			"a": "undo reverses a jj command (operation), while restore recovers file contents. They are completely different features.",
+			"gitComparison": "git has no undo. You need to choose between git reset, git revert, git checkout --, and git reflog depending on the situation. jj has just two: undo (operation level) and restore (file level).",
+			"cmdLabels": {
+				"0": "Undo entire operation",
+				"1": "Restore to any point",
+				"2": "Restore file to parent state",
+				"3": "Restore all files to parent state"
+			}
+		},
+		"1": {
+			"q": "What's the difference between change ID and commit ID?",
+			"a": "Change ID is an immutable ID assigned to a \"change\". Commit ID is assigned to a \"snapshot\" and changes every time you edit files.",
+			"gitComparison": "git has no change ID, only commit hash. When you git commit --amend, you get a new hash and can only find the old one through reflog. In jj, the change ID is immutable, making tracking easy.",
+			"cmdLabels": {
+				"0": "Specify by change ID",
+				"1": "Specify by commit ID"
+			}
+		},
+		"2": {
+			"q": "Why is there no staging (git add)?",
+			"a": "In jj, the working copy itself is a commit. Just saving a file automatically reflects it in the commit. If you want to commit only part of the changes, use jj split.",
+			"gitComparison": "git: stage parts with git add -p then git commit. jj: commit everything first then split with jj split. Opposite approach. jj is better suited for \"save first, organize later\".",
+			"cmdLabels": {
+				"0": "Split a commit",
+				"1": "Split specific files only"
+			}
+		},
+		"3": {
+			"q": "What's the difference between jj new and jj commit?",
+			"a": "jj new creates a new empty commit. jj commit is a shortcut that runs jj describe then jj new. It adds a message to the current WC then moves to a new commit. Order matters: jj new then jj describe would add the message to the wrong commit.",
+			"gitComparison": "git commit is a single command for staging then committing. jj commit does describe + new simultaneously. In jj, \"commits always exist, messages are added later\".",
+			"cmdLabels": {
+				"0": "Create empty commit",
+				"1": "Commit with message",
+				"2": "Change message only"
+			}
+		},
+		"4": {
+			"q": "What is an empty commit? Can I delete it?",
+			"a": "A commit with no changes. Right after jj new, it's empty. Commonly used as a \"placeholder\" during work. In git, --allow-empty is needed for this special operation, but it's everyday in jj.",
+			"gitComparison": "git: empty commits can only be created with git commit --allow-empty. jj: created normally with jj new. Used as branch starting points or to indicate \"changes will go here later\".",
+			"cmdLabels": {
+				"0": "Delete empty commit",
+				"1": "Create empty commit"
+			}
+		},
+		"5": {
+			"q": "What is immutable? Why can't I edit it?",
+			"a": "Immutable commits cannot be rewritten. This applies to commits pushed to remote or protected by configuration. They are excluded from rebase and edit operations.",
+			"gitComparison": "git: similar to protected branches (GitHub branch protection), but jj controls at the individual commit level. git allows rewriting anything with force push, but jj requires explicitly removing immutable status."
+		},
+		"6": {
+			"q": "What's the relationship between bookmark and git branch?",
+			"a": "jj bookmark = git branch. jj bookmark create creates a git branch. However, in jj you can develop without branches (anonymous branch style).",
+			"gitComparison": "git: branches are required. Without them, you get a detached HEAD and lose track. jj: works without branches since change ID can track them. Bookmarks are only needed when pushing.",
+			"cmdLabels": {
+				"0": "Create bookmark",
+				"1": "Move bookmark",
+				"2": "Delete bookmark",
+				"3": "Push to remote"
+			}
+		},
+		"7": {
+			"q": "How to work in parallel (branch) without branches?",
+			"a": "jj new <revision> creates a new WC from any point. You can freely branch without bookmarks (branch names) since change ID tracks everything. View branches in jj log's DAG.",
+			"gitComparison": "git: git checkout -b feature always requires a branch name. Branching without names leads to detached HEAD and difficult tracking. jj: just jj new @-- to branch, tracked by change ID. No branch name management needed. Only add jj bookmark create when pushing.",
+			"cmdLabels": {
+				"0": "Branch from parent",
+				"1": "Branch from 2 commits back",
+				"2": "Branch from specific change",
+				"3": "Return to original work"
+			}
+		},
+		"8": {
+			"q": "Does 1 jj commit equal 1 git feature branch?",
+			"a": "For small fixes, 1 jj commit is roughly equal to 1 git feature branch (1-commit branch). For larger features, jj also stacks multiple commits. The difference: git groups by branch name, jj uses the DAG structure itself, so labels are unnecessary.",
+			"detail": "## Mapping work units between jj and git\n\n| git | jj |\n|-----|-----|\n| 1 feature branch (1 commit) | 1 commit |\n| 1 feature branch (N commits) | Chain of N commits (bookmark optional) |\n| branch name | description + bookmark if needed |\n\n## Small fixes\n\n```\n# git: create branch and make 1 commit\ngit checkout -b fix/typo\ngit commit -m \"fix typo\"\n\n# jj: complete with 1 commit\njj describe -m \"fix typo\"\n```\n\n## Large features\n\n```\n# git\ngit checkout -b feature/auth\ngit commit -m \"add types\"\ngit commit -m \"add API\"\ngit commit -m \"add UI\"\n\n# jj: stack the same way. bookmark only for push\njj describe -m \"add types\"\njj new\njj describe -m \"add API\"\njj new\njj describe -m \"add UI\"\njj bookmark set feature-auth -r @  # add to head before push\n```\n\n## Why it works without bookmarks\n\nIn git, without a branch name you get a detached HEAD and commits are lost.\njj's change IDs are immutable, so commits are trackable on the DAG without branch names.\n`jj log` visually shows branches, so you can understand \"what work\" from descriptions alone.",
+			"gitComparison": "In git, branches serve as both \"a way to group work\" and \"a required mechanism\". In jj, these are separated: the DAG is the management tool, bookmarks are just labels. Naming is optional, done only when needed.",
+			"cmdLabels": {
+				"0": "Add description",
+				"1": "Branch from any point",
+				"2": "Bookmark before push"
+			}
+		},
+		"9": {
+			"q": "Does a bookmark (branch name) advance automatically?",
+			"a": "No. In git, the branch pointer automatically points to the latest commit, but jj bookmarks must be manually moved. This is by design: \"bookmarks are labels for pushing\".",
+			"detail": "## Difference between git and jj\n\n```\n# git: branch advances automatically on commit\ngit checkout feature\ngit commit -m \"change 1\"  # feature -> commit1\ngit commit -m \"change 2\"  # feature -> commit2 (advances automatically)\n\n# jj: bookmark is manual\njj bookmark set feature -r @\njj new\njj describe -m \"change 2\"\n# feature still points to the previous commit!\njj bookmark set feature -r @  # manually reassign\n```\n\n## Recommended workflow\n\nWork without worrying about bookmarks, add to head just before pushing:\n```\n# Working: commit freely without bookmarks\njj new\njj describe -m \"step 1\"\njj new\njj describe -m \"step 2\"\n\n# Pushing: bookmark at head\njj bookmark set my-feature -r @\njj git push\n```\n\n## Why not auto-advance?\n\nIn jj, parallel work creates multiple heads.\nAuto-determining which head to track is difficult, so explicit assignment is the design choice.\nSince change IDs provide tracking, missing bookmarks are not a problem.",
+			"gitComparison": "git: branch pointer advances automatically with each commit. This is git's basic behavior: branch = pointer to latest commit. jj: bookmarks must be moved manually. Seems inconvenient, but with \"track locally by change ID, use bookmark only for push\" workflow, it's fine. git branches are \"required infrastructure\", jj bookmarks are \"optional labels\".",
+			"cmdLabels": {
+				"0": "Move bookmark to head",
+				"1": "List bookmarks",
+				"2": "Push"
+			}
+		},
+		"10": {
+			"q": "Can I commit with conflicts?",
+			"a": "Yes. In jj, conflicts are recorded as commits. Resolve them later. Work is not interrupted like in git.",
+			"gitComparison": "git: conflict during merge/rebase means you can't do other work until resolved. jj: save conflict as commit, work on something else, come back and resolve later. Non-blocking.",
+			"cmdLabels": {
+				"0": "Resolve conflicts",
+				"1": "Check conflict status"
+			}
+		},
+		"11": {
+			"q": "What's the difference between jj rebase and git rebase?",
+			"a": "Same concept (changing a commit's parent), but jj doesn't stop on conflicts, which is a major difference. Also, jj explicitly distinguishes between moving a single commit (-r) and moving with descendants (-s, -b).",
+			"gitComparison": "git rebase: conflict, stop, resolve, continue - repeat. jj rebase: records conflicts as commits. Resolve everything at once after completion.",
+			"cmdLabels": {
+				"0": "Move single commit",
+				"1": "Move with descendants",
+				"2": "Move entire branch"
+			}
+		},
+		"12": {
+			"q": "How to undo all jj operations?",
+			"a": "jj op restore returns to any operation point. Check jj op log for the operation list and specify the ID of the point you want to restore to.",
+			"gitComparison": "git: reflog + reset --hard gets close, but only works per branch. jj: completely restores the entire repository to any operation point.",
+			"cmdLabels": {
+				"0": "Show operation list",
+				"1": "Undo last operation",
+				"2": "Restore to specific point",
+				"3": "Compare before/after operation"
+			}
+		},
+		"13": {
+			"q": "What is evolog?",
+			"a": "Evolution history of a single change. The change ID is immutable, but a new commit ID snapshot is created each time you edit files. evolog displays this history.",
+			"gitComparison": "No direct git equivalent. git reflog tracks branch movement history, but evolog tracks \"how a single change's content evolved\". Think of it as automatic history of git commit --amend.",
+			"cmdLabels": {
+				"0": "Working copy evolution history",
+				"1": "Specific change history"
+			}
+		},
+		"14": {
+			"q": "What is a Divergent Change (??)? How to fix it?",
+			"a": "A state where the same change ID has diverged into multiple commits. Marked with ?? in jj log. This is a jj-specific issue that doesn't occur in git.",
+			"detail": "## How it happens\n\njj's change ID is immutable, but the underlying commit (commit ID) can be rewritten.\nWhen one commit is rewritten from two different places, you get two commits with the same change ID.\n\n## Common patterns\n\n### Pattern 1: Mixing git operations in a colocated repo\n```\njj describe -m \"feature\"   # jj rewrites the commit\ngit commit --amend -m \"fix\" # git also rewrites the same commit\n-> separate rewrites from jj and git -> divergent\n```\n\n### Pattern 2: Operating on the same change from different terminals\n```\n# Terminal A: jj describe sxvmlnny -m \"AAA\"\n# Terminal B: jj squash -r sxvmlnny  (nearly simultaneous)\n-> both rewrite the original commit -> divergent\n```\n\n### Pattern 3: describe + auto-snapshot (most common)\n```\n# edit files while sxvmlnny is WC\n# -> auto-snapshot updates commit ID\njj new          # WC moves to new change\n# edit files (in new WC)\njj describe sxvmlnny -m \"feat: ...\"\n# describe rewrites old commit -> two commits with\n# same change ID -> divergent\n```\n\n## Why it doesn't happen in git\n\ngit's commit hash is a unique value computed from content.\n\"Different versions with the same hash\" cannot exist by design.\njj's change ID is an abstraction layer independent of content, making this possible.\n\n## Resolution steps\n\n### Method 1: abandon (when new commits are on top)\n\n#### Step 1: Identify which one is orphaned\n```\njj log  # check the DAG to see which is in @'s ancestor chain\n```\nThe one in @'s ancestor chain cannot be removed (would break @). The orphaned one is the abandon candidate.\n\n#### Step 2: Check if WC contains all orphaned changes\n```\njj diff --from @ --to ORPHANED_COMMIT_ID\n```\nNo + lines (additions) means WC is a complete superset, safe to abandon.\n+ lines indicate \"code only in the orphaned side, not in WC\".\n\n#### Step 3: Import + lines if any\n```\njj restore --from ORPHANED_COMMIT_ID path/to/file\n```\n\n#### Step 4: abandon\n```\njj abandon -r ORPHANED_COMMIT_ID\n```\nAlways specify by commit ID. Using change ID would delete both.\n\n### Method 2: op restore to before divergence (reliable but larger rollback)\n```\njj op log     # find the operation before divergence\njj op restore OP_ID\n```\nAll operations after divergence are rolled back, but resolution is guaranteed.\n\n## Before abandoning: The WC trap\n\nWhen diffing between two divergent commits, you see code only in one side.\nYou might think \"abandoning this will lose code!\" but if WC contains those changes, it's fine.\n\n```\n@  qoswmyuv  <- WC. Actual files are here\n|\no  sxvmlnny?? 46fe29bd  <- parent. Missing some changes\n|\n| o  sxvmlnny?? a55e5b1a  <- this one has them\n|/\n```\n\nEven if diff --from a55e5b1a --to 46fe29bd shows \"lost\" changes,\nif WC(qoswmyuv) contains them, abandoning won't lose anything.\n\nVerification:\n```\njj diff --from @ --to ORPHANED_COMMIT_ID\n```\nNo + lines = everything is in WC. + lines = only those are missing.\n\n## Many commands error during divergence\n\nSpecifying a divergent change ID makes jj unable to determine \"which commit?\",\ncausing errors in evolog, diff, describe, etc.:\n```\n$ jj evolog -r sxvmlnny\nError: Change ID `sxvmlnny` is divergent\nHint: Use commit ID to select single revision\n```\n\nWorkaround: specify commit ID directly or resolve divergence first.\n```\njj evolog -r a55e5b1a    # specify by commit ID\njj evolog -r 46fe29bd    # the other one\n```",
+			"gitComparison": "git has no concept of divergent changes. git's commit hash is uniquely determined from content, so \"different versions of the same ID\" cannot exist by design. jj's change ID is independent of content, so different commits can share the same change ID. Especially common when using git commands directly in colocated repos.",
+			"cmdLabels": {
+				"0": "Find divergent changes",
+				"1": "Discard unwanted one",
+				"2": "Check operation history",
+				"3": "Restore to before divergence"
+			}
+		},
+		"15": {
+			"q": "How to start using jj with a git repository?",
+			"a": "Use jj git init for new repos. For existing git repos, add --colocate so .git and .jj coexist in the same directory, allowing git commands alongside jj. jj init is deprecated; git backend is the only option.",
+			"gitComparison": "Without --colocate: git repo is hidden inside .jj/ (git commands can't be used directly). With --colocate: .git and .jj coexist, git commands work too. However, direct git commit may cause tracking issues, so using jj commands is recommended.",
+			"cmdLabels": {
+				"0": "Create new repo",
+				"1": "Use with existing git repo",
+				"2": "Clone from git remote"
+			}
+		},
+		"16": {
+			"q": "git clean -xdf deletes .jj/!",
+			"a": "git clean's -x flag ignores .gitignore and deletes everything. Even if .jj/ is in .gitignore, -x will delete it. This is the biggest trap in colocate mode.",
+			"gitComparison": "git clean -df: keeps files listed in .gitignore. git clean -xdf: completely ignores .gitignore and deletes everything. -x is meant for \"removing build artifacts\" but .jj/ gets caught too. When using jj, avoid -x or exclude with -e .jj.",
+			"cmdLabels": {
+				"0": "Safe clean (respects ignore)",
+				"1": "Clean excluding .jj"
+			}
+		},
+		"17": {
+			"q": "Running a jj command wiped my git staging!",
+			"a": "jj has no staging concept. Running a jj command re-snapshots the entire working copy, resetting git's index (staging area). Don't mix jj and git operations in colocate mode.",
+			"gitComparison": "Staged state from git add is stored in git's index. But jj doesn't manage the index, so it resets on jj command execution. In colocate mode, stick to either \"jj only\" or \"git only\". Mixing leads to accidents.",
+			"cmdLabels": {
+				"0": "Undo in jj's world"
+			}
+		},
+		"18": {
+			"q": "Unfamiliar display in git status (new file shown as not staged)",
+			"a": "In colocate mode, jj automatically manipulates git's index during snapshots. Files you haven't git added may appear as \"Changes not staged for commit: new file:\". Normally they'd show under Untracked files, but jj adds them to the index, causing unexpected git status output.",
+			"gitComparison": "Normal git: new files show under Untracked files, moving to Changes to be committed after git add. Colocate mode: jj directly manipulates the index, so new file: appears under Changes not staged for commit without git add. This is an unexpected state for git. In colocate mode, trust jj st over git status.",
+			"cmdLabels": {
+				"0": "Check jj status",
+				"1": "Check git status"
+			}
+		},
+		"19": {
+			"q": "How to remove a file from past commits (rewriting history)?",
+			"a": "Use jj restore --from <rev>- --to <rev> <path> to exclude a specific file from a specific commit. This means \"restore to <rev>-'s state (where the file doesn't exist)\". Descendants are automatically rebased.",
+			"detail": "## Use case\n\nFor removing files accidentally included in initial commits (.env, large binaries, unwanted config files, etc.)\nfrom history.\n\n## Example: Remove .playwright-mcp from initial commit\n\n```\n# First check the target commit\njj log -r 'all()'\n\n# Remove .playwright-mcp from ovklzmrn (initial commit)\n# --from ovklzmrn- means \"parent's state\" = state without that file\njj restore --from ovklzmrn- --to ovklzmrn .playwright-mcp\n```\n\n## For immutable commits\n\nTo rewrite pushed (immutable) commits, add --ignore-immutable:\n```\njj restore --from ovklzmrn- --to ovklzmrn .playwright-mcp --ignore-immutable\n```\n\n## What happens\n\n1. .playwright-mcp is removed from the specified commit (ovklzmrn)\n2. All descendants are automatically rebased\n3. The file's influence propagates through descendant commits\n\n## Caveats\n\n- Rewriting pushed commits requires force push\n- Consult collaborators before proceeding\n- Use jj undo to revert if something goes wrong",
+			"gitComparison": "Doing this in git requires git filter-branch or git rebase -i + git rm, which is very tedious. There's also the BFG Repo-Cleaner external tool. In jj, a single jj restore command does it all, with automatic descendant rebasing. Dramatically simpler.",
+			"cmdLabels": {
+				"0": "Remove file from history",
+				"1": "Execute even if immutable",
+				"2": "Undo the operation"
+			}
+		},
+		"20": {
+			"q": "Tips for using AI tools (Claude Code, etc.) with jj?",
+			"a": "Don't run jj commands while AI is editing files. Auto-snapshot and jj commands rewriting the same change simultaneously causes divergent changes.",
+			"detail": "## Why it's dangerous\n\nWhen AI tools edit files, the next jj command triggers auto-snapshot, updating the commit ID.\nRunning describe, squash, new etc. at this timing causes the snapshot rewrite and command rewrite to conflict, creating divergent changes.\n\n## Especially dangerous operations\n\nRunning these while AI is editing tends to cause divergence:\n```\njj describe  # rewrites same change's commit -> conflict\njj squash    # rewrites same change's commit -> conflict\njj new       # snapshot + new runs -> timing-dependent conflict\n```\n\n## Safe workflow\n\n1. Wait for AI work to complete\n2. Check state with jj log after completion\n3. Then run describe, new, squash etc.\n\n## Safe operations (OK during AI work)\n\n```\njj log       # read-only, just checking state\njj st        # read-only\njj diff      # read-only\njj op log    # read-only\n```\nRead-only commands trigger snapshots but don't rewrite changes, so they're safe.",
+			"gitComparison": "In git, even if AI tools edit files, commits aren't affected until explicit git add && git commit. jj's auto-snapshot immediately reflects file changes in commits. This difference causes the divergent problem when using AI. git is less prone to \"accidental conflicts\", but jj's auto-snapshot prevents \"forgetting to commit\".",
+			"cmdLabels": {
+				"0": "Check state after AI completes",
+				"1": "Review changes",
+				"2": "Add description",
+				"3": "Move to next commit"
+			}
+		}
+	}
+}

@@ -1,5 +1,7 @@
 // Server-side structured logger with elapsed time tracking
 
+import { VERBOSE } from "./config";
+
 const GRAY = "\x1b[90m";
 const CYAN = "\x1b[36m";
 const YELLOW = "\x1b[33m";
@@ -41,7 +43,7 @@ export function logCmd(
 		console.log(
 			`${GRAY}${timestamp()}${RESET} ${tag} ${RED}ERR${RESET} ${cmd} ${elapsed}`,
 		);
-	} else {
+	} else if (VERBOSE) {
 		console.log(
 			`${GRAY}${timestamp()}${RESET} ${tag} ${cmd} ${elapsed}`,
 		);
@@ -55,6 +57,7 @@ export function logLoader(
 ): void {
 	const tag = `${CYAN}${BOLD}[loader]${RESET}`;
 	const elapsed = `${GREEN}${formatMs(elapsedMs)}${RESET}`;
+	if (!VERBOSE) return;
 	const p = params ? ` ${GRAY}${params}${RESET}` : "";
 	console.log(
 		`${GRAY}${timestamp()}${RESET} ${tag} ${route}${p} ${elapsed}`,
@@ -69,6 +72,7 @@ export function logLoaderError(
 	const tag = `${CYAN}${BOLD}[loader]${RESET}`;
 	const elapsed = `${GREEN}${formatMs(elapsedMs)}${RESET}`;
 	const msg = error instanceof Error ? error.message : String(error);
+	// Errors are always logged regardless of VERBOSE
 	console.log(
 		`${GRAY}${timestamp()}${RESET} ${tag} ${RED}ERR${RESET} ${route} ${msg} ${elapsed}`,
 	);

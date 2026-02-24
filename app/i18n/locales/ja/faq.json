@@ -1,0 +1,216 @@
+{
+	"pageTitle": "FAQ: jj のよくある疑問",
+	"pageDescription": "git ユーザーが jj を使い始めるときに戸惑うポイントをまとめました。",
+	"relatedCommands": "関連コマンド",
+	"gitComparisonTitle": "git との比較",
+	"gitDifference": "との違い",
+	"items": {
+		"0": {
+			"q": "jj undo と jj restore の違いは？",
+			"a": "undo は「jj コマンド（操作）の取り消し」、restore は「ファイル内容の復元」。全く別の機能。",
+			"gitComparison": "git には undo がない。git reset, git revert, git checkout --, git reflog を状況に応じて使い分ける必要がある。jj は undo（操作レベル）と restore（ファイルレベル）の2つだけ。",
+			"cmdLabels": {
+				"0": "操作を丸ごと取り消す",
+				"1": "任意の時点に復元",
+				"2": "ファイルを親の状態に戻す",
+				"3": "全ファイルを親の状態に"
+			}
+		},
+		"1": {
+			"q": "change ID と commit ID の違いは？",
+			"a": "change ID は「変更」に付く不変の ID。commit ID は「スナップショット」に付く ID で、ファイルを編集するたびに変わる。",
+			"gitComparison": "git には change ID がない。commit hash のみ。git commit --amend すると新しい hash になり、古い hash は reflog からしか辿れない。jj では change ID が不変なので追跡が容易。",
+			"cmdLabels": {
+				"0": "change ID で指定",
+				"1": "commit ID で指定"
+			}
+		},
+		"2": {
+			"q": "なぜ staging（git add）がないの？",
+			"a": "jj では作業コピー自体がコミット。ファイルを保存するだけで自動的にコミットに反映される。「一部だけコミットしたい」場合は jj split で分割する。",
+			"gitComparison": "git: git add -p で一部をステージング → git commit。jj: まず全部コミット → jj split で分割。アプローチが逆。jj の方が「とりあえず保存、後で整理」に向いている。",
+			"cmdLabels": {
+				"0": "コミットを分割",
+				"1": "特定ファイルだけ分割"
+			}
+		},
+		"3": {
+			"q": "jj new と jj commit の違いは？",
+			"a": "jj new は「新しい空のコミットを作成」。jj commit は「jj describe → jj new」の順で実行するショートカット。現在の WC にメッセージを付けてから新しいコミットへ進む。順番が重要で、jj new → jj describe だと新しい方にメッセージが付いてしまう。",
+			"gitComparison": "git commit は staging → 確定の1コマンド。jj commit は describe + new の2つを同時に行う。jj では「コミットは常に存在し、後からメッセージを付ける」という考え方。",
+			"cmdLabels": {
+				"0": "空のコミットを作成",
+				"1": "メッセージ付きで確定",
+				"2": "メッセージだけ変更"
+			}
+		},
+		"4": {
+			"q": "empty commit って何？消していいの？",
+			"a": "変更がないコミット。jj new した直後は empty。作業中の「場所取り」として普通に使う。git では --allow-empty が必要な特殊操作だが、jj では日常。",
+			"gitComparison": "git: 空コミットは git commit --allow-empty でしか作れない特殊なもの。jj: jj new で普通に作る。ブランチの開始点として使ったり、「ここに後で変更を入れる」という意図を示したりする。",
+			"cmdLabels": {
+				"0": "空コミットを削除",
+				"1": "空コミットを作成"
+			}
+		},
+		"5": {
+			"q": "immutable って何？なぜ編集できないの？",
+			"a": "immutable は書き換え不可のコミット。リモートに push 済みのコミットや、設定で保護されたコミットに付く。rebase や edit の対象外。",
+			"gitComparison": "git: 保護ブランチ（GitHub の branch protection）に近いが、jj では個々のコミットレベルで制御。git は force push すれば何でも書き換えられるが、jj は明示的に immutable を解除しないと編集不可。"
+		},
+		"6": {
+			"q": "bookmark と git branch の関係は？",
+			"a": "jj bookmark = git branch。jj bookmark create で git ブランチが作られる。ただし jj ではブランチなしで開発できる（匿名ブランチ的な使い方）。",
+			"gitComparison": "git: ブランチ必須。ブランチなしだと detached HEAD で迷子になる。jj: ブランチなしでも change ID で追跡できるので問題ない。push するときだけ bookmark が必要。",
+			"cmdLabels": {
+				"0": "ブックマーク作成",
+				"1": "ブックマーク移動",
+				"2": "ブックマーク削除",
+				"3": "リモートに push"
+			}
+		},
+		"7": {
+			"q": "ブランチなしで並行作業（分岐）するには？",
+			"a": "jj new <revision> で任意の地点から新しい WC を作れる。bookmark（ブランチ名）を付けなくても change ID で追跡できるので、名前なしで自由に分岐できる。jj log で DAG を見れば分岐が分かる。",
+			"gitComparison": "git: git checkout -b feature で必ずブランチ名が必要。名前なしで分岐すると detached HEAD で追跡困難。jj: jj new @-- だけで分岐でき、change ID で追跡可能。ブランチ名の管理が不要なので気軽に分岐できる。push するときだけ jj bookmark create で名前を付ければよい。",
+			"cmdLabels": {
+				"0": "親から分岐",
+				"1": "2つ前から分岐",
+				"2": "特定の変更から分岐",
+				"3": "元の作業に戻る"
+			}
+		},
+		"8": {
+			"q": "jj の 1 commit は git の feature branch に相当する？",
+			"a": "小さい修正なら jj 1 commit ≈ git 1 feature branch（1 commit のブランチ）。大きい機能なら jj でも複数コミットを積む。違いは、git はブランチ名で束ねるが、jj は DAG の形自体が構造なのでラベル不要。",
+			"detail": "## jj と git の作業単位の対応\n\n| git | jj |\n|-----|-----|\n| 1 feature branch（1 commit） | 1 commit |\n| 1 feature branch（N commits） | N commits の連鎖（bookmark は任意） |\n| branch 名 | description + 必要なら bookmark |\n\n## 小さい修正の場合\n\n```\n# git: ブランチを作って1コミット\ngit checkout -b fix/typo\ngit commit -m \"fix typo\"\n\n# jj: コミット1つで完結\njj describe -m \"fix typo\"\n```\n\n## 大きい機能の場合\n\n```\n# git\ngit checkout -b feature/auth\ngit commit -m \"add types\"\ngit commit -m \"add API\"\ngit commit -m \"add UI\"\n\n# jj: 同じように積む。push するときだけ bookmark\njj describe -m \"add types\"\njj new\njj describe -m \"add API\"\njj new\njj describe -m \"add UI\"\njj bookmark set feature-auth -r @  # push 前に先頭に付ける\n```\n\n## なぜ bookmark なしで管理できるのか\n\ngit はブランチ名がないと detached HEAD になり、コミットが迷子になる。\njj は change ID が不変なので、ブランチ名がなくても DAG 上で追跡可能。\n`jj log` で分岐が視覚的に見えるので、名前がなくても「何の作業か」を description で把握できる。",
+			"gitComparison": "git ではブランチが「作業を束ねる管理手段」と「git の仕組み上の必須要素」を兼ねている。jj ではこれが分離され、DAG が管理手段、bookmark はラベルに過ぎない。名前付けは任意で、必要なときだけやる。",
+			"cmdLabels": {
+				"0": "説明を付ける",
+				"1": "任意の地点から分岐",
+				"2": "push 前に bookmark"
+			}
+		},
+		"9": {
+			"q": "bookmark（ブランチ名）は自動で進む？",
+			"a": "進まない。git では commit するとブランチポインタが自動で最新を指すが、jj の bookmark は手動で付け替える必要がある。これは設計上の意図で「bookmark は push 用のラベル」という思想。",
+			"detail": "## git と jj の違い\n\n```\n# git: commit するとブランチが自動で進む\ngit checkout feature\ngit commit -m \"change 1\"  # feature → commit1\ngit commit -m \"change 2\"  # feature → commit2（自動で進む）\n\n# jj: bookmark は手動\njj bookmark set feature -r @\njj new\njj describe -m \"change 2\"\n# ここで feature はまだ前のコミットを指したまま！\njj bookmark set feature -r @  # 手動で付け替え\n```\n\n## 推奨ワークフロー\n\n普段は bookmark を気にせず作業し、push する直前に先頭につける:\n```\n# 作業中: bookmark なしで自由にコミット\njj new\njj describe -m \"step 1\"\njj new\njj describe -m \"step 2\"\n\n# push するとき: 先頭に bookmark\njj bookmark set my-feature -r @\njj git push\n```\n\n## なぜ自動で進めないのか\n\njj では並行作業で複数の head が存在する。\nどの head を追跡すべきか自動判定が難しいため、明示的に指定する設計になっている。\nその代わり change ID で追跡できるので、bookmark がなくても困らない。",
+			"gitComparison": "git: ブランチポインタは commit ごとに自動で進む。これが git の基本動作であり、ブランチ = 最新コミットへのポインタ。jj: bookmark は手動で移動する必要がある。面倒に見えるが、「ローカルでは change ID で追跡、push 時だけ bookmark を使う」運用なら問題ない。git のブランチは「必須のインフラ」、jj の bookmark は「オプションのラベル」。",
+			"cmdLabels": {
+				"0": "bookmark を先頭に移動",
+				"1": "bookmark 一覧",
+				"2": "push"
+			}
+		},
+		"10": {
+			"q": "conflict があってもコミットできるの？",
+			"a": "はい。jj では conflict 状態でもコミットとして記録される。後から解消すればOK。git のように作業が中断されない。",
+			"gitComparison": "git: merge/rebase 中に conflict → 解消するまで他の作業ができない。jj: conflict をコミットとして保存 → 別の作業をして → 後で戻って解消。ノンブロッキング。",
+			"cmdLabels": {
+				"0": "conflict を解消",
+				"1": "conflict の状態を確認"
+			}
+		},
+		"11": {
+			"q": "jj rebase と git rebase の違いは？",
+			"a": "基本は同じ（コミットの親を変える）だが、jj は conflict で中断しない点が大きく異なる。また jj は単一コミットの移動（-r）と子孫ごと移動（-s, -b）を明示的に使い分ける。",
+			"gitComparison": "git rebase: conflict → 中断 → 解消 → continue を繰り返す。jj rebase: conflict があってもそのままコミットとして記録。全部終わってから一括で解消できる。",
+			"cmdLabels": {
+				"0": "単一コミットを移動",
+				"1": "子孫ごと移動",
+				"2": "ブランチごと移動"
+			}
+		},
+		"12": {
+			"q": "jj の操作を全部取り消すには？",
+			"a": "jj op restore で任意の操作時点に戻れる。jj op log で操作一覧を確認し、戻したい時点の ID を指定する。",
+			"gitComparison": "git: reflog + reset --hard で近いことはできるが、ブランチ単位でしか戻せない。jj: リポジトリ全体を任意の操作時点に完全復元できる。",
+			"cmdLabels": {
+				"0": "操作一覧を表示",
+				"1": "直前の操作を取り消し",
+				"2": "特定時点に復元",
+				"3": "操作の前後を比較"
+			}
+		},
+		"13": {
+			"q": "evolog って何？",
+			"a": "1つの change の進化履歴。change ID は不変だが、ファイルを編集するたびに新しい commit ID でスナップショットが作られる。evolog はその履歴を表示する。",
+			"gitComparison": "git には直接の対応なし。git reflog はブランチの移動履歴だが、evolog は「1つの変更の内容がどう変わってきたか」を追跡する。git commit --amend の履歴が自動で残るイメージ。",
+			"cmdLabels": {
+				"0": "作業コピーの進化履歴",
+				"1": "特定 change の履歴"
+			}
+		},
+		"14": {
+			"q": "Divergent Change (??) って何？どう直すの？",
+			"a": "同じ change ID が複数のコミットに分岐した状態。jj log で ?? マークが付く。jj 固有の問題で、git では発生しない。",
+			"detail": "## 発生メカニズム\n\njj の change ID は不変だが、裏の commit（commit ID）は書き換え可能。\n1つのコミットが2箇所から別々に書き換えられると、同じ change ID で2つのコミットができてしまう。\n\n## よくある発生パターン\n\n### パターン1: colocated repo で git 操作を混ぜた\n```\njj describe -m \"feature\"   # jj が commit を書き換え\ngit commit --amend -m \"fix\" # git も同じ commit を書き換え\n→ jj と git で別々の書き換えが発生 → divergent\n```\n\n### パターン2: 別ターミナルで同じ change を同時操作\n```\n# Terminal A: jj describe sxvmlnny -m \"AAA\"\n# Terminal B: jj squash -r sxvmlnny  (ほぼ同時)\n→ 両方が元のコミットを書き換え → divergent\n```\n\n### パターン3: describe + 自動スナップショット（最も多い）\n```\n# sxvmlnny が WC の状態でファイル編集\n# → 自動スナップショットで commit ID が更新\njj new          # WC が新 change に移動\n# ファイルを編集（新 WC で）\njj describe sxvmlnny -m \"feat: ...\"\n# describe が古い commit を書き換え → 新旧2つの commit が\n# 同じ change ID を持つ → divergent\n```\n\n## なぜ git では起きないのか\n\ngit の commit hash は内容から計算される一意な値。\n「同じ hash の別バージョン」は原理的に存在しない。\njj は change ID という抽象レイヤーを持つ分、この問題が起きうる。\n\n## 解消手順\n\n### 方法1: abandon（新しいコミットが上に乗っている場合）\n\n#### ステップ1: どちらが孤立しているか確認\n```\njj log  # DAG を見て @ の祖先チェーンにいる方を確認\n```\n@ の祖先にいる方は消せない（消すと @ が壊れる）。孤立している方が abandon 候補。\n\n#### ステップ2: WC に孤立側の変更が全部含まれているか確認\n```\njj diff --from @ --to ORPHANED_COMMIT_ID\n```\n+ 行（追加）がなければ WC は孤立側の完全上位互換 → 安心して abandon できる。\n+ 行があればそれが「WC にない、孤立側だけのコード」。\n\n#### ステップ3: + 行があれば取り込む\n```\njj restore --from ORPHANED_COMMIT_ID path/to/file\n```\n\n#### ステップ4: abandon\n```\njj abandon -r ORPHANED_COMMIT_ID\n```\n必ず commit ID で指定。change ID だと両方消えてしまう。\n\n### 方法2: op restore で分岐前に戻す（確実だが巻き戻しが大きい）\n```\njj op log     # 分岐前の操作を探す\njj op restore OP_ID\n```\n分岐後の操作はすべて巻き戻されるが、確実に解消できる。\n\n## abandon する前に: WC の罠\n\ndivergent な2つの commit 間で diff を取ると、片方にしかないコードが見える。\n「これを abandon したらコードが消える！」と思いがちだが、\nWC（作業コピー）にその変更が含まれていれば問題ない。\n\n```\n@  qoswmyuv  ← WC。ファイルの実体はここ\n│\n○  sxvmlnny?? 46fe29bd  ← 親。一部の変更がない\n│\n│ ○  sxvmlnny?? a55e5b1a  ← こっちにはある\n├─╯\n```\n\ndiff -from a55e5b1a --to 46fe29bd で「消える」ように見えても、\nWC(qoswmyuv) に含まれていれば abandon しても失われない。\n\n確認方法:\n```\njj diff --from @ --to ORPHANED_COMMIT_ID\n```\n+ 行がなければ WC に全部入っている。+ 行があればそれだけが不足分。\n\n## divergent 中は多くのコマンドがエラーになる\n\ndivergent な change ID を指定すると、jj は「どっちの commit？」と\n判断できないため、evolog, diff, describe などがエラーになる:\n```\n$ jj evolog -r sxvmlnny\nError: Change ID `sxvmlnny` is divergent\nHint: Use commit ID to select single revision\n```\n\n回避策: commit ID で直接指定するか、先に divergent を解消する。\n```\njj evolog -r a55e5b1a    # commit ID で指定\njj evolog -r 46fe29bd    # もう片方\n```",
+			"gitComparison": "git には divergent change の概念がない。git の commit hash は内容から一意に決まるため「同じ ID の別バージョン」は原理的に発生しない。jj の change ID は内容と独立した ID なので、同じ change ID に対して異なる commit が生まれうる。colocated repo で git コマンドを直接使うと特に起きやすい。",
+			"cmdLabels": {
+				"0": "divergent な change を探す",
+				"1": "不要な方を捨てる",
+				"2": "操作履歴を確認",
+				"3": "分岐前に復元"
+			}
+		},
+		"15": {
+			"q": "git リポジトリで jj を使い始めるには？",
+			"a": "jj git init で新規作成。既存の git リポで使うなら --colocate を付けると .git と .jj が同じディレクトリに共存し、git コマンドも併用できる。jj init は廃止され、git backend 一択になった。",
+			"gitComparison": "--colocate なし: .jj/ の中に git repo が隠れる（git コマンドは直接使えない）。--colocate あり: .git と .jj が共存し git コマンドも使える。ただし直接 git commit すると jj が追跡しきれないことがあるので jj 経由が推奨。",
+			"cmdLabels": {
+				"0": "新規リポ作成",
+				"1": "既存 git リポで併用",
+				"2": "git リモートから clone"
+			}
+		},
+		"16": {
+			"q": "git clean -xdf で .jj/ が消える！",
+			"a": "git clean の -x フラグは .gitignore を無視して削除する。.gitignore に .jj/ を書いていても -x がある限り消される。colocate モードの最大の罠。",
+			"gitComparison": "git clean -df: .gitignore に書かれたファイルは残す。git clean -xdf: .gitignore を完全無視して全削除。-x は「ビルド成果物を消す」用途だが、.jj/ も巻き添えになる。jj を使う場合は -x を避けるか -e .jj で除外すること。",
+			"cmdLabels": {
+				"0": "安全な clean（ignore 尊重）",
+				"1": ".jj を除外して clean"
+			}
+		},
+		"17": {
+			"q": "jj コマンドを実行したら git の staging が消えた！",
+			"a": "jj にはstagingの概念がない。jj コマンドを実行すると作業コピーを丸ごとスナップショットし直すため、git の index（staging area）はリセットされる。colocate モードでは jj と git の操作を混ぜないこと。",
+			"gitComparison": "git add でステージングした状態は git の index に保存される。しかし jj は index を管理しないため、jj コマンド実行時にリセットしてしまう。colocate モードでは「jj だけ使う」か「git だけ使う」のどちらかに統一すべき。混在は事故の元。",
+			"cmdLabels": {
+				"0": "jj の世界で戻す"
+			}
+		},
+		"18": {
+			"q": "git status で見たことない表示が出る（new file が not staged に出る）",
+			"a": "colocate モードでは jj がスナップショット時に git の index を自動操作する。そのため git add していないファイルが「Changes not staged for commit: new file:」として表示されることがある。通常の git なら Untracked files に出るはずだが、jj が index に追加してしまうため git の表示がおかしくなる。",
+			"gitComparison": "通常の git: 新しいファイルは Untracked files に表示され、git add すると Changes to be committed の new file: に移る。colocate モード: jj が index を直接操作するため、git add していないのに new file: が Changes not staged for commit に出る。git の想定外の状態なので見慣れない表示になる。colocate モードでは git status より jj st を信用すること。",
+			"cmdLabels": {
+				"0": "jj のステータス確認",
+				"1": "git のステータス確認"
+			}
+		},
+		"19": {
+			"q": "過去のコミットからファイルを削除したい（歴史の書き換え）",
+			"a": "jj restore --from <rev>- --to <rev> <path> で、特定のコミットから特定のファイルを除外できる。「<rev>- の状態（= そのファイルがない状態）に戻す」という意味。子孫は自動で rebase される。",
+			"detail": "## ユースケース\n\n初期コミットに誤って含めたファイル（.env、大きなバイナリ、不要な設定ファイル等）を\n歴史から除外したい場合に使う。\n\n## 具体例: 初期コミットから .playwright-mcp を除外\n\n```\n# まず対象のコミットを確認\njj log -r 'all()'\n\n# ovklzmrn（初期コミット）から .playwright-mcp を除外\n# --from ovklzmrn- は「ovklzmrn の親の状態」= そのファイルがない状態\njj restore --from ovklzmrn- --to ovklzmrn .playwright-mcp\n```\n\n## immutable なコミットの場合\n\nリモートに push 済みの（immutable な）コミットを書き換えるには --ignore-immutable を付ける:\n```\njj restore --from ovklzmrn- --to ovklzmrn .playwright-mcp --ignore-immutable\n```\n\n## 何が起きるか\n\n1. 指定したコミット（ovklzmrn）から .playwright-mcp が消える\n2. そのコミットの子孫は全て自動で rebase される\n3. 子孫のコミットからもそのファイルの影響が伝播する\n\n## 注意点\n\n- push 済みのコミットを書き換えると force push が必要になる\n- 共同作業者がいる場合は事前に相談すること\n- 失敗したら jj undo で元に戻せる",
+			"gitComparison": "git で同じことをするには git filter-branch や git rebase -i + git rm を使う必要があり非常に面倒。BFG Repo-Cleaner という外部ツールもある。jj では jj restore 1コマンドで完結し、子孫の rebase も自動。圧倒的にシンプル。",
+			"cmdLabels": {
+				"0": "ファイルを歴史から除外",
+				"1": "immutable でも実行",
+				"2": "操作を取り消し"
+			}
+		},
+		"20": {
+			"q": "AI ツール（Claude Code 等）と jj を併用するときの注意は？",
+			"a": "AI がファイルを編集中は jj コマンドを実行しないこと。auto-snapshot と jj コマンドが同じ change を同時に書き換え、divergent change が発生する。",
+			"detail": "## なぜ危険なのか\n\nAI ツールがファイルを編集すると、次の jj コマンド実行時に auto-snapshot が走り commit ID が更新される。\nこのタイミングで describe, squash, new などを実行すると、\nsnapshot による書き換えとコマンドによる書き換えが競合して divergent change が発生する。\n\n## 特に危険な操作\n\nAI 編集中にこれらを実行すると divergent になりやすい:\n```\njj describe  # 同じ change の commit を書き換え → 競合\njj squash    # 同じ change の commit を書き換え → 競合\njj new       # snapshot + new が走る → タイミング次第で競合\n```\n\n## 安全な運用ルール\n\n1. AI の作業が完了するのを待つ\n2. 完了後に jj log で状態を確認\n3. それから describe, new, squash などを実行\n\n## 安全な操作（AI 作業中でも OK）\n\n```\njj log       # 読み取り専用。状態確認だけ\njj st        # 読み取り専用\njj diff      # 読み取り専用\njj op log    # 読み取り専用\n```\n読み取り専用のコマンドは snapshot をトリガーするが、change を書き換えないので安全。",
+			"gitComparison": "git では AI ツールがファイルを編集しても、明示的に git add && git commit するまでコミットに影響しない。jj は auto-snapshot があるため、ファイル変更が即座にコミットに反映される。この違いが AI 併用時の divergent 問題を引き起こす。git の方が「うっかり競合」は起きにくいが、jj の auto-snapshot は「コミットし忘れ」を防ぐメリットもある。",
+			"cmdLabels": {
+				"0": "AI 完了後に状態確認",
+				"1": "変更内容を確認",
+				"2": "説明を追加",
+				"3": "次のコミットへ"
+			}
+		}
+	}
+}

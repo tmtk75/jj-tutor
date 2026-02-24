@@ -1,0 +1,68 @@
+{
+	"title": "What If...?",
+	"desc": "コマンドを選択すると、実行した場合の結果を予測表示します。実際にはコマンドは実行されません。",
+	"emptyState": "← コマンドを選択して予測を表示",
+	"noCommits": "(no commits)",
+	"category": {
+		"create": "作成",
+		"modify": "変更",
+		"navigate": "移動",
+		"bookmark": "ブックマーク"
+	},
+	"cmd": {
+		"jj-new": {
+			"desc": "現在の WC を親にして、新しい空のワーキングコピーを作成する。"
+		},
+		"jj-new-branch": {
+			"displayName": "jj new @--（分岐）",
+			"desc": "2つ前の変更から分岐して新しい WC を作成。bookmark なしで並行作業できる。"
+		},
+		"jj-commit": {
+			"desc": "現在の WC に説明を付けて確定し、新しい空のワーキングコピーを作成する。jj describe + jj new と同等。"
+		},
+		"jj-squash": {
+			"desc": "WC の変更を親コミットに吸収する（git commit --amend 相当）。"
+		},
+		"jj-bookmark-set": {
+			"desc": "現在の WC にブックマーク（ブランチ名）を設定する。"
+		},
+		"jj-new-insert-before": {
+			"desc": "現在の WC の前に新しいコミットを挿入する。WC の親と WC の間に入る。"
+		},
+		"jj-describe": {
+			"desc": "現在の WC の説明（コミットメッセージ）を変更する。DAG の構造は変わらない。"
+		},
+		"jj-edit-parent": {
+			"desc": "WC を親コミットに移動する。親を直接編集できるようになる。"
+		},
+		"jj-undo": {
+			"desc": "直前の操作を取り消し、リポジトリを1つ前の状態に戻す。git には直接の対応がない強力な機能。"
+		},
+		"jj-restore": {
+			"desc": "作業コピーのファイルを親コミットの状態に戻す。git restore / git checkout -- に相当。"
+		}
+	},
+	"predict": {
+		"jjNew": "新しい空のワーキングコピーが作成され、現在の WC が親になります。現在の変更はそのまま親コミットとして残ります。",
+		"jjNew.gitEquiv": "git add -A && git commit -m \"...\"",
+		"jjNewBranch": "2つ前のコミットから分岐して新しい WC を作成。元の WC はそのまま残るので、後で jj edit で戻れる。bookmark を付けなくても change ID で追跡できる。",
+		"jjNewBranch.gitEquiv": "git stash && git checkout -b feature HEAD~2",
+		"jjCommit": "jj new と似ていますが、同時にコミットメッセージが設定されます。現在の WC に説明が付き、新しい空の WC が作成されます。",
+		"jjCommit.gitEquiv": "git add -A && git commit -m \"message\"",
+		"jjSquash": "WC の変更が親コミットに吸収されます。WC は空になりますが、同じ change ID を保持します。",
+		"jjSquash.gitEquiv": "git add -A && git commit --amend",
+		"jjBookmarkSet": "現在の WC にブックマーク 'main' が設定されます。git の 'git branch main' に相当しますが、jj ではブックマークは自動で動きません。",
+		"jjBookmarkSet.gitEquiv": "git branch main HEAD",
+		"jjNewInsertBefore": "現在の WC と親の間に新しいコミットが挿入されます。新しいコミットが WC になり、元の WC はその子になります。",
+		"jjNewInsertBefore.gitEquiv": "git rebase -i で途中にコミットを挿入（複数ステップ必要）",
+		"jjDescribe": "WC のコミットメッセージが変更されます。DAG の構造は変わりません。change ID も commit ID も変わりません（内容が同じため）。",
+		"jjDescribe.gitEquiv": "git commit --amend -m 'message'（hash が変わる）",
+		"jjUndo": "直前の操作が取り消され、リポジトリが1つ前の状態に戻ります。After は実際の1つ前の operation の状態です。",
+		"jjUndo.fallback": "直前の操作が取り消されます（前の状態の取得に失敗したため Before と同じ表示です）。",
+		"jjUndo.gitEquiv": "git reflog → git reset --hard <hash>",
+		"jjRestore": "作業コピーの全ファイルが親コミットの状態に戻ります（WC が empty になる）。change ID は変わらず、DAG 構造も変わりません。⚠️ colocate モードでは git の staging area もリセットされます。",
+		"jjRestore.gitEquiv": "git restore .（unstaged のみ。staged は残る）",
+		"jjEditParent": "ワーキングコピーが親コミットに移動します。親を直接編集でき、元の WC は子として残ります。作業が終わったら jj new で戻れます。",
+		"jjEditParent.gitEquiv": "git stash && git checkout HEAD~（detached HEAD）"
+	}
+}

@@ -1,0 +1,86 @@
+{
+	"pageSubtitle": "DAG 上のコミットをクリックして Source → Destination を選択。結果を予測表示します。",
+	"modeInfo": {
+		"revision": {
+			"label": "単一リビジョン",
+			"desc": "選択したコミットだけを移動。子は元の親に再接続。"
+		},
+		"subtree": {
+			"label": "サブツリー",
+			"desc": "コミットと子孫をまとめて移動。"
+		},
+		"branch": {
+			"label": "ブランチ",
+			"desc": "ブランチ全体を移動（共通祖先まで遡る）。"
+		}
+	},
+	"selection": {
+		"clickToSelect": "クリックで選択",
+		"selectSourceFirst": "Source を先に選択",
+		"selectSourceHint": "コミットをクリックして Source を選択",
+		"selectDestHint": "コミットをクリックして Destination を選択",
+		"clickToSelectInDag": "(クリックで選択)"
+	},
+	"legend": {
+		"source": "移動元 (source)",
+		"dest": "移動先 (dest)",
+		"moved": "移動後"
+	},
+	"conflict": {
+		"wouldConflict": "コンフリクトが発生する可能性があります",
+		"existingConflicts": "既存のコンフリクト ({{count}} 件)",
+		"unresolvedConflicts": "未解消のコンフリクト:",
+		"detail": "詳細",
+		"jjConflict": {
+			"title": "jj のコンフリクト",
+			"recordedInCommit": "コンフリクトは<1>コミットに記録</1>される",
+			"noInterruption": "作業が中断されない",
+			"resolveAnytime": "後からいつでも解消可能",
+			"workOnOther": "他のコミットに先に取り組める"
+		},
+		"gitConflict": {
+			"title": "git のコンフリクト",
+			"rebaseStops": "rebase が<1>途中で停止</1>する",
+			"mustResolve": "解消するまで次に進めない",
+			"continueNeeded": "を繰り返す",
+			"multipleResolves": "複数コミットだと何度も解消が必要"
+		},
+		"resolution": {
+			"title": "解消手順",
+			"step1Hint": "コンフリクトのあるコミットの上に移動",
+			"step2": "ファイル内のコンフリクトマーカーを編集して解消",
+			"step3Hint": "修正をコンフリクトコミットに統合"
+		},
+		"markers": {
+			"title": "jj のコンフリクトマーカー",
+			"leftChange": "左側の変更（移動元の内容）",
+			"baseDiff": "ベースからの差分",
+			"rightChange": "右側の変更（移動先の内容）",
+			"note": "※ git の",
+			"noteDiff": "区切りと異なり、jj は diff ベース（",
+			"noteSuffix": "セクション）"
+		}
+	},
+	"predict": {
+		"revision": {
+			"move": "{{source}} を {{dest}} の上に移動します。元の子コミットは {{source}} の親に再接続されます。",
+			"alreadyChild": "{{source}} は既に {{dest}} の子です。変化はありません。"
+		},
+		"subtree": {
+			"move": "{{source}} とその子孫をまとめて {{dest}} の上に移動します。サブツリー内の親子関係は保持されます。",
+			"alreadyChild": "{{source}} は既に {{dest}} の子です。変化はありません。"
+		},
+		"branch": {
+			"move": "{{source}} を含むブランチ全体を {{dest}} の上に移動します。共通祖先まで遡って移動します。"
+		},
+		"conflictExplanation": "{{source}} と {{dest}} は祖先・子孫の関係にないため、同じファイルを変更している場合にコンフリクトが発生する可能性があります。\n\n※ これはヒューリスティックな予測です。実際のコンフリクト発生はファイル内容に依存します。"
+	},
+	"validation": {
+		"sourceNotFound": "Source \"{{changeId}}\" が見つかりません。",
+		"destNotFound": "Destination \"{{changeId}}\" が見つかりません。",
+		"sameSrcDest": "Source と Destination が同じです。移動の必要はありません。",
+		"immutable": "{{changeId}} は immutable です。rebase できません。",
+		"rootCommit": "root コミットは rebase できません。",
+		"cycle": "Destination が Source の子孫です。サイクルが発生するため rebase できません。"
+	}
+}

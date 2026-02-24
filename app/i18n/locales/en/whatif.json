@@ -1,0 +1,68 @@
+{
+	"title": "What If...?",
+	"desc": "Select a command to see a predicted outcome. No commands are actually executed.",
+	"emptyState": "← Select a command to see the prediction",
+	"noCommits": "(no commits)",
+	"category": {
+		"create": "Create",
+		"modify": "Modify",
+		"navigate": "Navigate",
+		"bookmark": "Bookmark"
+	},
+	"cmd": {
+		"jj-new": {
+			"desc": "Create a new empty working copy on top of the current WC."
+		},
+		"jj-new-branch": {
+			"displayName": "jj new @-- (branch)",
+			"desc": "Branch from 2 commits back and create a new WC. Work in parallel without bookmarks."
+		},
+		"jj-commit": {
+			"desc": "Finalize the current WC with a description and create a new empty WC. Equivalent to jj describe + jj new."
+		},
+		"jj-squash": {
+			"desc": "Absorb WC changes into the parent commit (equivalent to git commit --amend)."
+		},
+		"jj-bookmark-set": {
+			"desc": "Set a bookmark (branch name) on the current WC."
+		},
+		"jj-new-insert-before": {
+			"desc": "Insert a new commit before the current WC, between the WC and its parent."
+		},
+		"jj-describe": {
+			"desc": "Change the description (commit message) of the current WC. DAG structure remains unchanged."
+		},
+		"jj-edit-parent": {
+			"desc": "Move the WC to the parent commit. You can directly edit the parent."
+		},
+		"jj-undo": {
+			"desc": "Undo the last operation and restore the repository to its previous state. A powerful feature with no direct git equivalent."
+		},
+		"jj-restore": {
+			"desc": "Restore working copy files to the parent commit's state. Equivalent to git restore / git checkout --."
+		}
+	},
+	"predict": {
+		"jjNew": "A new empty working copy is created, with the current WC becoming its parent. Your current changes remain as the parent commit.",
+		"jjNew.gitEquiv": "git add -A && git commit -m \"...\"",
+		"jjNewBranch": "A new WC is created branching from 2 commits back. The original WC remains, so you can return via jj edit. No bookmark needed — tracked by change ID.",
+		"jjNewBranch.gitEquiv": "git stash && git checkout -b feature HEAD~2",
+		"jjCommit": "Similar to jj new, but also sets the commit message. The current WC gets a description and a new empty WC is created on top.",
+		"jjCommit.gitEquiv": "git add -A && git commit -m \"message\"",
+		"jjSquash": "WC changes are absorbed into the parent commit. The WC becomes empty but retains the same change ID.",
+		"jjSquash.gitEquiv": "git add -A && git commit --amend",
+		"jjBookmarkSet": "Bookmark 'main' is set on the current WC. Similar to 'git branch main', but jj bookmarks don't move automatically.",
+		"jjBookmarkSet.gitEquiv": "git branch main HEAD",
+		"jjNewInsertBefore": "A new commit is inserted between the current WC and its parent. The new commit becomes the WC, and the original WC becomes its child.",
+		"jjNewInsertBefore.gitEquiv": "git rebase -i to insert a commit (multiple steps required)",
+		"jjDescribe": "The WC's commit message is changed. DAG structure remains the same. Neither change ID nor commit ID changes (since content is unchanged).",
+		"jjDescribe.gitEquiv": "git commit --amend -m 'message' (hash changes)",
+		"jjUndo": "The last operation is undone and the repository reverts to its previous state. The After view shows the actual previous operation state.",
+		"jjUndo.fallback": "The last operation is undone (showing same as Before because the previous state could not be retrieved).",
+		"jjUndo.gitEquiv": "git reflog → git reset --hard <hash>",
+		"jjRestore": "All files in the working copy are restored to the parent commit's state (WC becomes empty). Change ID is preserved and DAG structure remains the same. ⚠️ In colocate mode, git's staging area is also reset.",
+		"jjRestore.gitEquiv": "git restore . (unstaged only; staged remains)",
+		"jjEditParent": "The working copy moves to the parent commit. You can directly edit the parent, and the original WC remains as a child. Use jj new to return when done.",
+		"jjEditParent.gitEquiv": "git stash && git checkout HEAD~ (detached HEAD)"
+	}
+}

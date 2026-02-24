@@ -13,3 +13,5 @@ function detectRepoRoot(): string {
 
 export const REPO_PATH =
 	process.env.JJ_TUTOR_REPO_PATH || detectRepoRoot();
+
+export const VERBOSE = process.env.JJ_TUTOR_VERBOSE === "1";

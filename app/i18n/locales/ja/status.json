@@ -1,0 +1,162 @@
+{
+	"title": "Working Copy Status",
+	"jjStatus": "jj status",
+	"gitStatusLabel": "git status",
+	"stagingNotice": "staging 不要。ファイルを変更するだけで自動的にこのコミットに含まれる。",
+	"gitStagingNotice": "git add → staged → git commit の3段階。jj が内部で管理するため直接 git 操作は非推奨。",
+	"noChangesJj": "No changes in working copy",
+	"noChangesGit": "No changes (clean)",
+	"divergent": {
+		"title": "Divergent Change が検出されました",
+		"desc": "同じ change ID が複数のコミットに分岐しています:",
+		"explanation": "describe と自動スナップショットが同時に起きると発生しやすい。git には同等の概念がない（jj 固有の状態）。",
+		"detailLink": "発生原因と解消方法の詳細 →",
+		"method1Title": "方法1: 孤立した方を abandon",
+		"method1Step1": "1. <code>jj log</code> で @ の祖先にいる方を確認（そちらは残す）",
+		"method1Step2": "2. <code>jj diff --from @ --to COMMIT_ID</code> で確認（+ 行がなければ WC に全部入っている）",
+		"method1Step3": "3. + 行があれば <code>jj restore --from COMMIT_ID path</code> で取り込む",
+		"method1Step4": "4. <code>jj abandon -r COMMIT_ID</code>（commit ID で指定。change ID だと両方消える）",
+		"method2Title": "方法2: 分岐前に戻す",
+		"method2Desc": "op log で分岐前の操作を探して、その時点に復元。確実だがその後の操作もすべて巻き戻る。"
+	},
+	"tips": {
+		"title": "今の状態でできること",
+		"unstaged": {
+			"title": "Unstaged な変更がある",
+			"gitRevert": "git で戻すには",
+			"gitRestorePath": "unstaged の変更を破棄。staged はそのまま残る。",
+			"gitRestoreStaged": "staged を unstaged に戻す（変更自体は残る）。",
+			"jjRevert": "jj で戻すには",
+			"jjRestorePath": "指定ファイルを親コミットの状態に復元。staged/unstaged の区別がないので、これだけでOK。",
+			"jjRestoreAll": "全ファイルを親の状態に戻す（git checkout . 相当）。"
+		},
+		"staged": {
+			"title": "Staged な変更のみ",
+			"gitConfirm": "git で確定するには",
+			"gitConfirmDesc": "staged をコミットとして確定。",
+			"jjNote": "jj では",
+			"jjNoteDesc": "jj では既にコミット済み（作業コピー = コミット）。次のコミットに進むなら:",
+			"jjNewDesc": "現在の作業コピーを確定し、新しい空のコミットを作成。"
+		},
+		"wcChanges": {
+			"title": "作業コピーに変更がある（{{count}} files）",
+			"moveForward": "次に進む",
+			"moveForwardDesc": "変更を確定して新しいコミットへ",
+			"splitPart": "一部だけ分ける",
+			"splitPartDesc": "対話的にコミットを分割",
+			"squashToParent": "親に統合",
+			"squashToParentDesc": "変更を親コミットに吸収"
+		},
+		"undoVsRestore": {
+			"title": "jj undo vs jj restore の違い",
+			"undoLabel": "操作の取り消し",
+			"undoDesc": "直前の <strong>jj コマンド（操作）</strong> をまるごと取り消す。rebase, describe, new などの操作単位で巻き戻し。",
+			"undoExample1": "$ jj rebase -r X -d Y",
+			"undoExample2": "# あ、間違えた",
+			"undoExample3": "$ jj undo",
+			"undoExample4": "# rebase 前の状態に戻る",
+			"undoGit": "git 相当: git reflog + git reset",
+			"restoreLabel": "ファイル内容の復元",
+			"restoreDesc": "特定の <strong>ファイルの中身</strong> を別のリビジョンから復元。操作ログには影響せず、ファイル内容だけ変わる。",
+			"restoreExample1": "$ jj restore --from @- src/app.ts",
+			"restoreExample2": "# app.ts だけ親の状態に戻る",
+			"restoreExample3": "$ jj restore --from @-",
+			"restoreExample4": "# 全ファイルを親の状態に戻す",
+			"restoreGit": "git 相当: git restore / git checkout --"
+		}
+	},
+	"opComp": {
+		"title": "操作比較: こうしたらこうなる",
+		"subtitle": "同じことをしたいとき、jj と git でどうコマンドが違うか。jj は git の複雑な操作をシンプルに。",
+		"0": {
+			"label": "変更を記録",
+			"jj": {
+				"desc": "ファイル保存 → 自動でコミットに反映。staging 不要。jj は常にスナップショットを取る。"
+			},
+			"git": {
+				"desc": "git add でステージング → git commit で確定。2段階必要。"
+			}
+		},
+		"1": {
+			"label": "新しいコミットを作る",
+			"jj": {
+				"desc": "現在の作業コピーの上に空のコミットを作成。git では空コミットは --allow-empty が必要。"
+			},
+			"git": {
+				"desc": "空コミットは特殊操作。通常は変更をステージしてから commit。"
+			}
+		},
+		"2": {
+			"label": "コミットを分割",
+			"jj": {
+				"desc": "インタラクティブに1つのコミットを2つに分割。対話的に変更を選択。"
+			},
+			"git": {
+				"desc": "rebase -i で edit に変更 → reset で戻す → 部分的に add → 複数回 commit。手順が多い。"
+			}
+		},
+		"3": {
+			"label": "直前のコミットに統合",
+			"jj": {
+				"desc": "作業コピーの変更を親コミットに統合。git の amend + add に相当。"
+			},
+			"git": {
+				"desc": "add でステージング → --amend で直前コミットを書き換え。"
+			}
+		},
+		"4": {
+			"label": "過去のコミットを編集",
+			"jj": {
+				"desc": "過去のコミットに直接移動して編集可能。作業コピーがそのコミットになる。"
+			},
+			"git": {
+				"desc": "rebase -i で edit マーク → そのコミットで停止 → 修正 → git rebase --continue。"
+			}
+		},
+		"5": {
+			"label": "リベース",
+			"jj": {
+				"desc": "任意のコミットを別の親に移動。conflict があっても中断せずコミットとして記録（後で解消可能）。"
+			},
+			"git": {
+				"desc": "conflict 発生で中断。解消 → git rebase --continue を繰り返す必要あり。"
+			}
+		},
+		"6": {
+			"label": "ブランチ作成",
+			"jj": {
+				"desc": "bookmark = git のブランチ。jj ではブランチなしでも開発可能（匿名ブランチ的）。"
+			},
+			"git": {
+				"desc": "ブランチは必須。ブランチなしではコミットが迷子になる（detached HEAD）。"
+			}
+		},
+		"7": {
+			"label": "マージ",
+			"jj": {
+				"desc": "複数の親を持つ新しいコミットを作成。jj new で任意個数の親を指定可能。"
+			},
+			"git": {
+				"desc": "2つのブランチをマージ。conflict 時は解消必須。octopus merge も可能だが稀。"
+			}
+		},
+		"8": {
+			"label": "ファイルの変更を戻す",
+			"jj": {
+				"desc": "指定ファイルを親コミットの状態に復元。全ファイルなら jj restore --from @-。staging の概念がないので1コマンド。"
+			},
+			"git": {
+				"desc": "unstaged の変更を戻す。staged を戻すには先に git restore --staged が必要。2段階。"
+			}
+		},
+		"9": {
+			"label": "変更を取り消す（操作単位）",
+			"jj": {
+				"desc": "操作単位で取り消し。jj undo で直前の操作を元に戻す。op restore で任意の時点に復元。"
+			},
+			"git": {
+				"desc": "reset (履歴を戻す), revert (新コミットで打ち消し), reflog (参照ログから復元)。用途で使い分け。"
+			}
+		}
+	}
+}

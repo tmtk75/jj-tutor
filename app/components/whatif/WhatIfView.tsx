@@ -6,6 +6,7 @@ import {
 	type Edge,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import { useTranslation } from "react-i18next";
 import { WHATIF_COMMANDS, type JjCommit, type GitCommit, type WhatIfPrediction } from "~/shared";
 import { CommitNode } from "../dag/CommitNode";
 import { GitCommitNode } from "../dag/GitCommitNode";
@@ -64,12 +65,7 @@ function buildGitGraph(commits: GitCommit[]) {
 	return { nodes: layoutDag(nodes, edges), edges };
 }
 
-const CATEGORY_LABELS: Record<string, string> = {
-	create: "作成",
-	modify: "変更",
-	navigate: "移動",
-	bookmark: "ブックマーク",
-};
+// Category labels are now translated via i18n: t("category.<key>")
 
 const FIT_OPTIONS = { padding: 0.2, minZoom: 0.7, maxZoom: 1 };
 
@@ -82,6 +78,7 @@ export function WhatIfView({
 	prediction: WhatIfPrediction | null;
 	onSelectCmd: (cmdId: string) => void;
 }) {
+	const { t } = useTranslation("whatif");
 	const beforeGraph = useMemo(
 		() => (prediction ? buildJjGraph(prediction.beforeCommits) : null),
 		[prediction],
@@ -114,9 +111,9 @@ export function WhatIfView({
 
 	return (
 		<div className="p-6 h-full flex flex-col">
-			<h2 className="text-lg font-bold mb-2">What If...?</h2>
+			<h2 className="text-lg font-bold mb-2">{t("title")}</h2>
 			<p className="text-xs text-text-muted mb-4">
-				コマンドを選択すると、実行した場合の結果を予測表示します。実際にはコマンドは実行されません。
+				{t("desc")}
 			</p>
 
 			<div className="flex gap-6 flex-1 min-h-0">
@@ -125,7 +122,7 @@ export function WhatIfView({
 					{[...grouped.entries()].map(([category, cmds]) => (
 						<div key={category}>
 							<div className="text-[10px] font-bold text-text-dim uppercase tracking-wider mb-1 px-2">
-								{CATEGORY_LABELS[category] ?? category}
+								{t(`category.${category}`, category)}
 							</div>
 							<div className="space-y-0.5">
 								{cmds.map((cmd) => (
@@ -139,9 +136,9 @@ export function WhatIfView({
 												: "text-text-primary hover:bg-surface-raised"
 										}`}
 									>
-										<div className="font-mono font-bold">{cmd.displayName}</div>
+										<div className="font-mono font-bold">{t(`cmd.${cmd.id}.displayName`, cmd.displayName)}</div>
 										<div className={`text-[10px] mt-0.5 leading-relaxed ${selectedCmd === cmd.id ? "text-purple-300" : "text-text-dim"}`}>
-											{cmd.description}
+											{t(`cmd.${cmd.id}.desc`)}
 										</div>
 									</button>
 								))}
@@ -169,14 +166,14 @@ export function WhatIfView({
 										</div>
 										<div className="text-[10px] text-text-dim">≈</div>
 										<div className="font-mono text-sm font-bold text-git-orange">
-											{prediction.gitEquivalent}
+											{t(prediction.gitEquivalent)}
 										</div>
 									</div>
 									<div className="text-xs text-text-muted mb-2">
-										{prediction.command.description}
+										{t(`cmd.${prediction.command.id}.desc`)}
 									</div>
 									<div className="text-xs text-text-primary border-t border-jj-blue/20 pt-2">
-										{prediction.explanation}
+										{t(prediction.explanation)}
 									</div>
 								</div>
 
@@ -271,7 +268,7 @@ export function WhatIfView({
 												</ReactFlow>
 											) : (
 												<div className="flex items-center justify-center h-full text-xs text-text-dim bg-git-orange/8 p-3 text-center">
-													(no commits)
+													{t("noCommits")}
 												</div>
 											)}
 										</div>
@@ -298,7 +295,7 @@ export function WhatIfView({
 												</ReactFlow>
 											) : (
 												<div className="flex items-center justify-center h-full text-xs text-text-dim bg-git-orange/8 p-3 text-center">
-													(no commits)
+													{t("noCommits")}
 												</div>
 											)}
 										</div>
@@ -308,7 +305,7 @@ export function WhatIfView({
 						</ClientOnly>
 					) : (
 						<div className="flex-1 flex items-center justify-center text-text-dim text-sm">
-							← コマンドを選択して予測を表示
+							{t("emptyState")}
 						</div>
 					)}
 				</div>

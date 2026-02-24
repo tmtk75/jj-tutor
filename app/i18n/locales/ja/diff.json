@@ -1,0 +1,40 @@
+{
+	"pageSubtitle": "revision の差分と、operation / evolog の関係",
+	"loading": "読み込み中...",
+	"noDiff": "差分なし",
+	"emptyCommit": "変更なし（empty commit）",
+	"revisionDiff": {
+		"title": "change の変更内容",
+		"description": "各 change が親からどう変わったかを表示。jj は自動スナップショットするため、常に最新の diff が見える。",
+		"filesChanged": "{{count}} file changed",
+		"filesChanged_other": "{{count}} files changed"
+	},
+	"divergentWarning": {
+		"title": "Divergent Change (??)",
+		"description": "この change ID は複数のコミットに分岐しています。",
+		"abandonHint": "で不要な方を捨てるか、",
+		"opRestoreHint": "で分岐前に戻してください。",
+		"faqLink": "詳細はFAQへ →"
+	},
+	"operationEvolution": {
+		"opLogDescription": "全操作の履歴。",
+		"evologDescription": "特定 change の進化履歴（op log のサブセット）。change を選ぶと、その change に影響した op がハイライトされる。",
+		"selectHint": "change を選択して Load すると、op log と evolog の関係を表示",
+		"opLogVsEvolog": {
+			"title": "op log vs evolog",
+			"opLog": "リポジトリへの全操作（new, commit, snapshot...）",
+			"evolog": "特定 change の進化履歴。op log を1つの change でフィルタしたもの",
+			"opLogComment": "# 全操作",
+			"evologComment": "# @ の履歴だけ"
+		},
+		"evologEntries": "{{count}} evolog entries / {{opCount}} operations"
+	},
+	"evologLegend": {
+		"description": "この change の進化履歴。ファイルを変更するたびに commit ID が更新される（change ID は不変）。",
+		"opRelation": "各エントリは operation（jj の操作記録）に紐付く。",
+		"opLogNote": "にはリポ全体の操作が記録されるが、evolog はそのうち",
+		"filterNote": "この change に影響した操作だけ",
+		"filterSuffix": "をフィルタしたもの。"
+	},
+	"firstSnapshot": "(最初のスナップショット)"
+}

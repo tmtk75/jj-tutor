@@ -1,99 +1,88 @@
-import { useMemo, useState } from "react";
 import {
-	ReactFlow,
 	Background,
 	Controls,
-	type Node,
 	type Edge,
+	type Node,
+	ReactFlow,
 } from "@xyflow/react";
+import { useMemo, useState } from "react";
 import "@xyflow/react/dist/style.css";
+import { useTranslation } from "react-i18next";
+import { ClientOnly } from "~/components/client-only";
 import type { JjCommit } from "~/shared";
 import { CommitNode } from "../dag/CommitNode";
 import { layoutDag } from "../dag/dagLayout";
-import { ClientOnly } from "~/components/client-only";
 
 const nodeTypes = { commit: CommitNode };
 const FIT_OPTIONS = { padding: 0.2, minZoom: 0.7, maxZoom: 1 };
 
 const PRESETS = [
-	{ expr: "@", label: "@", desc: "ワーキングコピー" },
-	{ expr: "@ | @-", label: "@ | @-", desc: "WC とその親" },
-	{ expr: "ancestors(@, 3)", label: "ancestors(@,3)", desc: "WC から3世代" },
-	{ expr: "heads(all())", label: "heads()", desc: "全ヘッド" },
-	{ expr: "roots(all())", label: "roots()", desc: "ルート" },
-	{ expr: "conflicts()", label: "conflicts()", desc: "コンフリクト中" },
-	{ expr: "divergent()", label: "divergent()", desc: "divergent" },
-	{ expr: "bookmarks()", label: "bookmarks()", desc: "ブックマーク付き" },
-	{ expr: "mine()", label: "mine()", desc: "自分のコミット" },
-	{ expr: "empty()", label: "empty()", desc: "空コミット" },
+	{ expr: "@", label: "@" },
+	{ expr: "@ | @-", label: "@ | @-" },
+	{ expr: "ancestors(@, 3)", label: "ancestors(@,3)" },
+	{ expr: "heads(all())", label: "heads()" },
+	{ expr: "roots(all())", label: "roots()" },
+	{ expr: "conflicts()", label: "conflicts()" },
+	{ expr: "divergent()", label: "divergent()" },
+	{ expr: "bookmarks()", label: "bookmarks()" },
+	{ expr: "mine()", label: "mine()" },
+	{ expr: "empty()", label: "empty()" },
 	{
 		expr: 'description("fix")',
 		label: 'desc("fix")',
-		desc: '説明に "fix" を含む',
 	},
-	{ expr: "mutable()", label: "mutable()", desc: "変更可能" },
-	{ expr: "immutable()", label: "immutable()", desc: "immutable" },
+	{ expr: "mutable()", label: "mutable()" },
+	{ expr: "immutable()", label: "immutable()" },
 ];
 
-const REFERENCE: { func: string; desc: string; example: string }[] = [
-	{ func: "@", desc: "ワーキングコピー", example: "@" },
-	{ func: "@-", desc: "WC の親", example: "@-" },
-	{ func: "@--", desc: "WC の祖父母", example: "@--" },
+const REFERENCE: { func: string; example: string }[] = [
+	{ func: "@", example: "@" },
+	{ func: "@-", example: "@-" },
+	{ func: "@--", example: "@--" },
 	{
 		func: "ancestors(x, n)",
-		desc: "x から n 世代の祖先",
 		example: "ancestors(@, 5)",
 	},
 	{
 		func: "descendants(x)",
-		desc: "x の全子孫",
 		example: "descendants(@-)",
 	},
-	{ func: "heads(x)", desc: "x のヘッド（子を持たない）", example: "heads(all())" },
+	{ func: "heads(x)", example: "heads(all())" },
 	{
 		func: "roots(x)",
-		desc: "x のルート（親を持たない）",
 		example: "roots(all())",
 	},
-	{ func: "all()", desc: "全コミット", example: "all()" },
-	{ func: "conflicts()", desc: "コンフリクト中のコミット", example: "conflicts()" },
+	{ func: "all()", example: "all()" },
+	{ func: "conflicts()", example: "conflicts()" },
 	{
 		func: "divergent()",
-		desc: "divergent な change",
 		example: "divergent()",
 	},
-	{ func: "empty()", desc: "空コミット", example: "empty()" },
-	{ func: "mine()", desc: "自分のコミット", example: "mine()" },
-	{ func: "mutable()", desc: "変更可能なコミット", example: "mutable()" },
-	{ func: "immutable()", desc: "変更不可なコミット", example: "immutable()" },
+	{ func: "empty()", example: "empty()" },
+	{ func: "mine()", example: "mine()" },
+	{ func: "mutable()", example: "mutable()" },
+	{ func: "immutable()", example: "immutable()" },
 	{
 		func: "bookmarks()",
-		desc: "ブックマーク付きコミット",
 		example: "bookmarks()",
 	},
 	{
 		func: "description(x)",
-		desc: "説明に x を含む",
 		example: 'description("fix")',
 	},
-	{ func: "x | y", desc: "和集合（union）", example: "@ | @-" },
+	{ func: "x | y", example: "@ | @-" },
 	{
 		func: "x & y",
-		desc: "積集合（intersection）",
 		example: "mine() & conflicts()",
 	},
 	{
 		func: "x ~ y",
-		desc: "差集合（difference）",
 		example: "all() ~ immutable()",
 	},
-	{ func: "x..y", desc: "x から y の間（range）", example: "@-..@" },
+	{ func: "x..y", example: "@-..@" },
 ];
 
-function buildJjGraph(
-	commits: JjCommit[],
-	matchedSet: Set<string> | null,
-) {
+function buildJjGraph(commits: JjCommit[], matchedSet: Set<string> | null) {
 	const nodes: Node[] = commits.map((c) => {
 		const isMatch = matchedSet ? matchedSet.has(c.commitId) : false;
 		return {
@@ -148,6 +137,7 @@ export function RevsetView({
 	currentInput: string;
 	onSubmit: (revset: string) => void;
 }) {
+	const { t } = useTranslation("revset");
 	const [input, setInput] = useState(currentInput || "@");
 	const [refExpanded, setRefExpanded] = useState(false);
 
@@ -170,11 +160,8 @@ export function RevsetView({
 		<div className="p-6 h-full flex flex-col">
 			{/* Header */}
 			<div className="mb-3 shrink-0">
-				<h2 className="text-lg font-bold">Revset Playground</h2>
-				<p className="text-xs text-text-muted">
-					revset 式を入力すると、マッチするコミットを DAG
-					上でハイライト表示します。
-				</p>
+				<h2 className="text-lg font-bold">{t("title")}</h2>
+				<p className="text-xs text-text-muted">{t("description")}</p>
 			</div>
 
 			{/* Input */}
@@ -213,9 +200,7 @@ export function RevsetView({
 				<div className="mb-2 shrink-0">
 					{error ? (
 						<div className="bg-git-red/8 border border-git-red/20 rounded-lg px-3 py-2">
-							<div className="text-xs font-bold text-git-red mb-1">
-								Error
-							</div>
+							<div className="text-xs font-bold text-git-red mb-1">Error</div>
 							<pre className="text-[10px] text-git-red font-mono whitespace-pre-wrap leading-relaxed max-h-24 overflow-y-auto">
 								{error}
 							</pre>
@@ -237,10 +222,10 @@ export function RevsetView({
 			{/* Presets */}
 			<div className="mb-3 shrink-0">
 				<div className="text-[10px] font-bold text-text-dim uppercase tracking-wider mb-1.5">
-					よく使う revset
+					{t("presetsLabel")}
 				</div>
 				<div className="flex flex-wrap gap-1.5">
-					{PRESETS.map((p) => (
+					{PRESETS.map((p, index) => (
 						<button
 							key={p.expr}
 							type="button"
@@ -250,7 +235,7 @@ export function RevsetView({
 									? "bg-jj-purple text-white"
 									: "bg-surface-raised text-text-secondary hover:bg-surface-overlay"
 							}`}
-							title={p.desc}
+							title={t(`preset.${index}.desc`)}
 						>
 							{p.label}
 						</button>
@@ -291,11 +276,11 @@ export function RevsetView({
 				<div className="flex items-center gap-4 mt-1 text-[10px] text-text-dim shrink-0">
 					<span className="flex items-center gap-1">
 						<span className="w-3 h-3 rounded border-2 border-jj-purple inline-block" />
-						マッチ
+						{t("legendMatch")}
 					</span>
 					<span className="flex items-center gap-1">
 						<span className="w-3 h-3 rounded border border-border-strong inline-block opacity-40" />
-						非マッチ
+						{t("legendNoMatch")}
 					</span>
 				</div>
 			)}
@@ -308,7 +293,7 @@ export function RevsetView({
 					className="w-full flex items-center justify-between px-4 py-2 bg-surface hover:bg-surface-raised transition-colors cursor-pointer"
 				>
 					<span className="text-xs font-bold text-text-secondary">
-						Revset リファレンス
+						{t("referenceTitle")}
 					</span>
 					<span className="text-xs text-text-dim">
 						{refExpanded ? "▼" : "▶"}
@@ -320,19 +305,19 @@ export function RevsetView({
 							<thead>
 								<tr className="text-left text-text-dim border-b border-border">
 									<th className="pb-1 font-semibold w-40">
-										関数 / 演算子
+										{t("referenceHeader.func")}
 									</th>
 									<th className="pb-1 font-semibold">
-										説明
+										{t("referenceHeader.desc")}
 									</th>
 									<th className="pb-1 font-semibold w-36">
-										例
+										{t("referenceHeader.example")}
 									</th>
 									<th className="pb-1 w-8" />
 								</tr>
 							</thead>
 							<tbody>
-								{REFERENCE.map((r) => (
+								{REFERENCE.map((r, index) => (
 									<tr
 										key={r.func}
 										className="border-b border-border hover:bg-surface"
@@ -341,7 +326,7 @@ export function RevsetView({
 											{r.func}
 										</td>
 										<td className="py-1.5 text-text-secondary">
-											{r.desc}
+											{t(`reference.${index}.desc`)}
 										</td>
 										<td className="py-1.5 font-mono text-text-muted">
 											{r.example}
@@ -349,9 +334,7 @@ export function RevsetView({
 										<td className="py-1.5">
 											<button
 												type="button"
-												onClick={() =>
-													handlePreset(r.example)
-												}
+												onClick={() => handlePreset(r.example)}
 												className="text-[10px] text-jj-purple hover:text-jj-purple/70 font-bold"
 												title="Try this"
 											>

@@ -1,20 +1,28 @@
-import { useMemo, useState, useCallback, useEffect, useRef, Fragment } from "react";
 import {
-	ReactFlow,
 	Background,
 	Controls,
-	type Node,
 	type Edge,
+	type Node,
+	ReactFlow,
 	type ReactFlowInstance,
 } from "@xyflow/react";
+import {
+	Fragment,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import "@xyflow/react/dist/style.css";
+import { useTranslation } from "react-i18next";
 import { useFetcher } from "react-router";
-import type { JjCommit, GitCommit } from "~/shared";
-import { RelativeTime } from "./RelativeTime";
-import { CommitNode } from "./CommitNode";
-import { GitCommitNode } from "./GitCommitNode";
-import { layoutDag } from "./dagLayout";
 import { ClientOnly } from "~/components/client-only";
+import type { GitCommit, JjCommit } from "~/shared";
+import { CommitNode } from "./CommitNode";
+import { layoutDag } from "./dagLayout";
+import { GitCommitNode } from "./GitCommitNode";
+import { RelativeTime } from "./RelativeTime";
 
 const nodeTypes = {
 	commit: CommitNode,
@@ -97,22 +105,19 @@ function GitContextBanner({
 	commitCount: number;
 	hasEdges: boolean;
 }) {
+	const { t } = useTranslation("dag");
+
 	if (gitMode === "branches" && commitCount === 0) {
 		return (
 			<div className="absolute bottom-3 left-3 right-3 z-10 bg-git-orange/10 border border-git-orange/20 rounded-lg p-3 text-xs text-text-secondary space-y-1.5">
 				<div className="font-bold text-git-orange">
-					git ブランチがまだありません
+					{t("gitBanner.noBranches.title")}
 				</div>
-				<div>
-					jj は内部で git を使いますが、明示的にブランチ（bookmark）を作るまで git の世界には何も見えません。
-				</div>
+				<div>{t("gitBanner.noBranches.description")}</div>
 				<div className="font-mono bg-surface-card/80 rounded px-2 py-1 text-[11px]">
 					jj bookmark create main -r @
 				</div>
-				<div className="text-text-muted">
-					↑ このコマンドで現在の作業コピーに &quot;main&quot; ブランチを作成できます。
-					作成すると、ここに git コミットグラフが表示されます。
-				</div>
+				<div className="text-text-muted">{t("gitBanner.noBranches.hint")}</div>
 			</div>
 		);
 	}
@@ -121,7 +126,7 @@ function GitContextBanner({
 		return (
 			<div className="absolute bottom-3 left-3 right-14 z-10 bg-git-orange/10 border border-git-orange/20 rounded px-3 py-1.5 text-[11px] text-text-secondary">
 				<span className="font-bold text-git-orange">Branches:</span>{" "}
-				jj bookmark で作成された git ブランチから到達可能なコミットを表示中
+				{t("gitBanner.branches.description")}
 			</div>
 		);
 	}
@@ -131,13 +136,14 @@ function GitContextBanner({
 			<div className="absolute bottom-3 left-3 right-14 z-10 bg-git-orange/10 border border-git-orange/20 rounded px-3 py-1.5 text-[11px] text-text-secondary space-y-1">
 				<div>
 					<span className="font-bold text-git-orange">All refs:</span>{" "}
-					<code className="bg-surface-card/80 rounded px-1">refs/jj/keep/*</code>{" "}
-					を含む全コミットを表示中（最新6件）
+					<code className="bg-surface-card/80 rounded px-1">
+						refs/jj/keep/*
+					</code>{" "}
+					{t("gitBanner.allRefs.description")}
 				</div>
 				{!hasEdges && (
 					<div className="text-text-muted">
-						各ノードが独立しているのは、jj が各スナップショットを独立した root commit として保持しているためです。
-						これらは jj の作業コピー自動保存の仕組みで、git から見ると互いに無関係なコミットに見えます。
+						{t("gitBanner.allRefs.independentNodes")}
 					</div>
 				)}
 			</div>
@@ -148,6 +154,7 @@ function GitContextBanner({
 }
 
 function JjContextBanner({ commits }: { commits: JjCommit[] }) {
+	const { t } = useTranslation("dag");
 	const wc = commits.find((c) => c.isWorkingCopy);
 	const immutableCount = commits.filter((c) => c.immutable).length;
 	const emptyCount = commits.filter((c) => c.empty).length;
@@ -156,24 +163,26 @@ function JjContextBanner({ commits }: { commits: JjCommit[] }) {
 		<div className="absolute bottom-3 left-3 right-14 z-10 bg-jj-purple/10 border border-jj-purple/20 rounded px-3 py-1.5 text-[11px] text-text-secondary space-y-0.5">
 			<div>
 				<span className="font-bold text-jj-purple">jj:</span>{" "}
-				{commits.length}件のコミット
+				{t("jjBanner.commitCount", { count: commits.length })}
 				{wc && (
 					<>
-						{" "}/ <span className="text-jj-blue font-bold">@</span> = 作業コピー
+						{" "}
+						/ <span className="text-jj-blue font-bold">@</span>{" "}
+						{t("jjBanner.workingCopy")}
 					</>
 				)}
 				{immutableCount > 0 && (
 					<>
-						{" "}/ <span className="text-immutable-gray">◆</span> = immutable（{immutableCount}件）
+						{" "}
+						/ <span className="text-immutable-gray">◆</span>{" "}
+						{t("jjBanner.immutable", { count: immutableCount })}
 					</>
 				)}
 				{emptyCount > 0 && (
-					<> / empty {emptyCount}件</>
+					<> / {t("jjBanner.emptyCount", { count: emptyCount })}</>
 				)}
 			</div>
-			<div className="text-text-dim">
-				時刻 = jj が最後にファイル変更を検知しスナップショットを作成した時刻（jj コマンド実行時に自動更新）
-			</div>
+			<div className="text-text-dim">{t("jjBanner.timestampHint")}</div>
 		</div>
 	);
 }
@@ -189,8 +198,10 @@ export function DagView({
 	gitMode: "branches" | "all";
 	onToggleGitMode: (mode: "branches" | "all") => void;
 }) {
+	const { t } = useTranslation("dag");
 	const [selectedCommitId, setSelectedCommitId] = useState<string | null>(null);
-	const selectedCommit = jjCommits.find((c) => c.commitId === selectedCommitId) ?? null;
+	const selectedCommit =
+		jjCommits.find((c) => c.commitId === selectedCommitId) ?? null;
 
 	const [panelHeight, setPanelHeight] = useState(() =>
 		typeof window !== "undefined" ? Math.round(window.innerHeight * 0.33) : 300,
@@ -204,7 +215,10 @@ export function DagView({
 			if (!isDragging.current) return;
 			const delta = startY.current - e.clientY;
 			const maxH = Math.round(window.innerHeight * 0.7);
-			const newHeight = Math.min(Math.max(startHeight.current + delta, 120), maxH);
+			const newHeight = Math.min(
+				Math.max(startHeight.current + delta, 120),
+				maxH,
+			);
 			setPanelHeight(newHeight);
 		};
 		const onMouseUp = () => {
@@ -231,14 +245,25 @@ export function DagView({
 		[panelHeight],
 	);
 
-	const [expandedEvologIdx, setExpandedEvologIdx] = useState<number | null>(null);
+	const [expandedEvologIdx, setExpandedEvologIdx] = useState<number | null>(
+		null,
+	);
 	const jjDagRef = useRef<HTMLDivElement>(null);
 	const gitDagRef = useRef<HTMLDivElement>(null);
 
 	const fetcher = useFetcher<{
-		evolog: { commitId: string; timestamp: string; description: string; empty: boolean }[];
+		evolog: {
+			commitId: string;
+			timestamp: string;
+			description: string;
+			empty: boolean;
+		}[];
 		diff: { status: string; path: string }[];
-		evologDiffs: { from: string; to: string; files: { status: string; path: string }[] }[];
+		evologDiffs: {
+			from: string;
+			to: string;
+			files: { status: string; path: string }[];
+		}[];
 	}>();
 
 	const jjGraph = useMemo(() => buildJjGraph(jjCommits), [jjCommits]);
@@ -251,12 +276,9 @@ export function DagView({
 		}
 	}, [selectedCommit?.changeId]);
 
-	const onNodeClick = useCallback(
-		(_: React.MouseEvent, node: Node) => {
-			setSelectedCommitId((prev) => (prev === node.id ? null : node.id));
-		},
-		[],
-	);
+	const onNodeClick = useCallback((_: React.MouseEvent, node: Node) => {
+		setSelectedCommitId((prev) => (prev === node.id ? null : node.id));
+	}, []);
 
 	return (
 		<div className="flex flex-col h-full">
@@ -360,216 +382,265 @@ export function DagView({
 			{/* Detail panel - 3 columns */}
 			{selectedCommit && (
 				<>
-				{/* Drag handle */}
-				<div
-					onMouseDown={onDragStart}
-					className="h-1.5 bg-surface-raised hover:bg-jj-purple/30 cursor-row-resize flex-shrink-0 transition-colors"
-				/>
-				<div className="bg-surface flex flex-col flex-shrink-0" style={{ height: panelHeight }}>
-					<div className="flex items-center gap-4 px-4 py-2 border-b border-border shrink-0">
-						<h3 className="font-bold text-sm">
-							<span className="text-jj-purple font-mono">{selectedCommit.changeId}</span>
-						</h3>
-						<div className="flex gap-2">
-							{selectedCommit.isWorkingCopy && (
-								<span className="bg-jj-blue/15 text-jj-blue px-2 py-0.5 rounded text-[10px]">working copy</span>
-							)}
-							{selectedCommit.empty && (
-								<span className="bg-yellow-500/15 text-yellow-400 px-2 py-0.5 rounded text-[10px]">empty</span>
-							)}
-							{selectedCommit.immutable && (
-								<span className="bg-surface-raised text-text-muted px-2 py-0.5 rounded text-[10px]">immutable</span>
-							)}
-							{selectedCommit.divergent && (
-								<span className="bg-amber-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">?? divergent</span>
-							)}
-						</div>
-						<span className="text-xs text-text-muted ml-auto">
-							{selectedCommit.description || "(no description)"}
-						</span>
-						<button
-							type="button"
-							onClick={() => setSelectedCommitId(null)}
-							className="text-xs text-text-dim hover:text-text-secondary transition-colors"
-						>
-							close
-						</button>
-					</div>
-					{selectedCommit.divergent && (
-						<div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-xs text-amber-300 leading-relaxed">
-							<strong>Divergent Change (??):</strong> 同じ change ID <code className="bg-amber-500/15 px-1 rounded font-mono">{selectedCommit.changeId.slice(0, 8)}</code> が複数のコミットに分岐しています。
-							describe と自動スナップショットの競合で発生しやすい。
-							<span className="block mt-1">
-								<strong>解消方法:</strong>
-								<code className="bg-amber-500/15 px-1 rounded font-mono ml-1">jj abandon {selectedCommit.commitId.slice(0, 8)}</code> で不要な方を捨てるか、
-								<code className="bg-amber-500/15 px-1 rounded font-mono ml-1">jj op restore</code> で分岐前に戻す。
-								<a href="/faq#divergent" className="text-amber-400 underline hover:text-amber-300 ml-1">詳細はFAQへ →</a>
+					{/* Drag handle */}
+					<div
+						onMouseDown={onDragStart}
+						className="h-1.5 bg-surface-raised hover:bg-jj-purple/30 cursor-row-resize flex-shrink-0 transition-colors"
+					/>
+					<div
+						className="bg-surface flex flex-col flex-shrink-0"
+						style={{ height: panelHeight }}
+					>
+						<div className="flex items-center gap-4 px-4 py-2 border-b border-border shrink-0">
+							<h3 className="font-bold text-sm">
+								<span className="text-jj-purple font-mono">
+									{selectedCommit.changeId}
+								</span>
+							</h3>
+							<div className="flex gap-2">
+								{selectedCommit.isWorkingCopy && (
+									<span className="bg-jj-blue/15 text-jj-blue px-2 py-0.5 rounded text-[10px]">
+										working copy
+									</span>
+								)}
+								{selectedCommit.empty && (
+									<span className="bg-yellow-500/15 text-yellow-400 px-2 py-0.5 rounded text-[10px]">
+										empty
+									</span>
+								)}
+								{selectedCommit.immutable && (
+									<span className="bg-surface-raised text-text-muted px-2 py-0.5 rounded text-[10px]">
+										immutable
+									</span>
+								)}
+								{selectedCommit.divergent && (
+									<span className="bg-amber-500 text-white px-2 py-0.5 rounded text-[10px] font-bold">
+										?? divergent
+									</span>
+								)}
+							</div>
+							<span className="text-xs text-text-muted ml-auto">
+								{selectedCommit.description || "(no description)"}
 							</span>
+							<button
+								type="button"
+								onClick={() => setSelectedCommitId(null)}
+								className="text-xs text-text-dim hover:text-text-secondary transition-colors"
+							>
+								close
+							</button>
 						</div>
-					)}
-					<div className="flex flex-1 min-h-0 divide-x divide-border">
-						{/* Detail */}
-						<div className="w-1/4 p-3 overflow-auto text-xs space-y-2">
-							<div className="font-bold text-text-dim text-[10px] uppercase tracking-wider">Detail</div>
-							<div>
-								<span className="text-text-dim">Change ID: </span>
-								<span className="font-mono text-jj-purple">{selectedCommit.changeId}</span>
-							</div>
-							<div>
-								<span className="text-text-dim">Commit ID: </span>
-								<span className="font-mono text-text-secondary">{selectedCommit.commitId}</span>
-							</div>
-							<div>
-								<span className="text-text-dim">Author: </span>
-								<span>{selectedCommit.authorEmail}</span>
-							</div>
-							<div>
-								<span className="text-text-dim">Time: </span>
-								<RelativeTime timestamp={selectedCommit.timestamp} />
-							</div>
-							<div>
-								<span className="text-text-dim">Parents: </span>
-								<span className="font-mono">{selectedCommit.parents.join(", ") || "(root)"}</span>
-							</div>
-							{selectedCommit.bookmarks.length > 0 && (
-								<div className="flex gap-1 flex-wrap">
-									{selectedCommit.bookmarks.map((b) => (
-										<span key={b} className="text-[10px] bg-wc-green/15 text-wc-green px-1.5 py-0.5 rounded font-mono">{b}</span>
-									))}
-								</div>
-							)}
-						</div>
-
-						{/* Evolog */}
-						<div className="w-2/5 p-3 overflow-auto text-xs">
-							<div className="font-bold text-text-dim text-[10px] uppercase tracking-wider mb-2">
-								Evolog
-								<span className="font-normal normal-case text-text-dim ml-2">
-									同じ change の書き換え履歴（クリックで diff 表示）
+						{selectedCommit.divergent && (
+							<div className="bg-amber-500/10 border-b border-amber-500/20 px-4 py-2 text-xs text-amber-300 leading-relaxed">
+								<strong>{t("detail.divergent.title")}</strong>{" "}
+								{t("detail.divergent.description", {
+									changeId: selectedCommit.changeId.slice(0, 8),
+								})}
+								<span className="block mt-1">
+									<strong>{t("detail.divergent.resolution")}</strong>
+									<code className="bg-amber-500/15 px-1 rounded font-mono ml-1">
+										jj abandon {selectedCommit.commitId.slice(0, 8)}
+									</code>{" "}
+									{t("detail.divergent.abandonHint")}
+									<code className="bg-amber-500/15 px-1 rounded font-mono ml-1">
+										jj op restore
+									</code>{" "}
+									{t("detail.divergent.opRestoreHint")}
+									<a
+										href="/faq#divergent"
+										className="text-amber-400 underline hover:text-amber-300 ml-1"
+									>
+										{t("detail.divergent.faqLink")}
+									</a>
 								</span>
 							</div>
-							{fetcher.state === "loading" ? (
-								<div className="text-text-dim">Loading...</div>
-							) : fetcher.data?.evolog ? (
-								<div className="space-y-0.5">
-									{fetcher.data.evolog.map((entry, i) => {
-										const diffData = fetcher.data?.evologDiffs?.[i];
-										const isExpanded = expandedEvologIdx === i;
-										const hasDiff = diffData && diffData.files.length > 0;
-
-										return (
-											<Fragment key={entry.commitId}>
-												<button
-													type="button"
-													onClick={() => hasDiff && setExpandedEvologIdx(isExpanded ? null : i)}
-													className={`w-full text-left flex items-center gap-2 px-2 py-1 rounded transition-colors ${
-														i === 0
-															? "bg-jj-purple/10 border border-jj-purple/20"
-															: isExpanded
-																? "bg-jj-blue/10 border border-jj-blue/20"
-																: "hover:bg-surface-raised"
-													} ${hasDiff ? "cursor-pointer" : "cursor-default"}`}
-												>
-													<span className="font-mono text-[10px] text-text-muted w-20 shrink-0">
-														{entry.commitId}
-													</span>
-													<RelativeTime timestamp={entry.timestamp} />
-													{entry.empty && (
-														<span className="text-[9px] bg-yellow-500/15 text-yellow-400 px-1 rounded">
-															empty
-														</span>
-													)}
-													{hasDiff && (
-														<span className="text-[9px] text-jj-blue ml-auto shrink-0">
-															{isExpanded ? "▼" : "▶"} {diffData.files.length} files
-														</span>
-													)}
-													{i === 0 && (
-														<span className="text-[9px] text-jj-purple ml-auto shrink-0">
-															latest
-														</span>
-													)}
-												</button>
-												{isExpanded && diffData && (
-													<div className="ml-4 pl-2 border-l-2 border-jj-blue/30 py-1 space-y-0.5">
-														<div className="text-[9px] text-text-dim mb-1">
-															← 前のスナップショットとの差分
-														</div>
-														{diffData.files.map((f) => (
-															<div
-																key={f.path}
-																className="flex items-center gap-1.5 font-mono text-[11px]"
-															>
-																<span
-																	className={`font-bold w-3 text-center ${
-																		f.status === "A"
-																			? "text-wc-green"
-																			: f.status === "M"
-																				? "text-jj-blue"
-																				: f.status === "D"
-																					? "text-git-red"
-																					: "text-text-muted"
-																	}`}
-																>
-																	{f.status}
-																</span>
-																<span className="text-text-secondary truncate">
-																	{f.path}
-																</span>
-															</div>
-														))}
-													</div>
-												)}
-											</Fragment>
-										);
-									})}
-									<div className="text-[10px] text-text-dim mt-2 border-t border-border pt-2">
-										commit ID が変わっても change ID は同じ = jj の「変更の書き換え」モデル。
-										ファイルを編集するたびに jj が自動で新しいスナップショットを作成します。
-									</div>
+						)}
+						<div className="flex flex-1 min-h-0 divide-x divide-border">
+							{/* Detail */}
+							<div className="w-1/4 p-3 overflow-auto text-xs space-y-2">
+								<div className="font-bold text-text-dim text-[10px] uppercase tracking-wider">
+									Detail
 								</div>
-							) : null}
-						</div>
-
-						{/* Changed Files */}
-						<div className="flex-1 p-3 overflow-auto text-xs">
-							<div className="font-bold text-text-dim text-[10px] uppercase tracking-wider mb-2">
-								Changed Files
-								<span className="font-normal normal-case text-text-dim ml-2">
-									このコミットの変更ファイル
-								</span>
-							</div>
-							{fetcher.state === "loading" ? (
-								<div className="text-text-dim">Loading...</div>
-							) : fetcher.data?.diff ? (
-								fetcher.data.diff.length > 0 ? (
-									<div className="space-y-0.5">
-										{fetcher.data.diff.map((f) => (
-											<div key={f.path} className="flex items-center gap-2 font-mono">
-												<span
-													className={`text-[10px] font-bold w-4 text-center ${
-														f.status === "A"
-															? "text-wc-green"
-															: f.status === "M"
-																? "text-jj-blue"
-																: f.status === "D"
-																	? "text-git-red"
-																	: "text-text-muted"
-													}`}
-												>
-													{f.status}
-												</span>
-												<span className="text-text-secondary truncate">{f.path}</span>
-											</div>
+								<div>
+									<span className="text-text-dim">Change ID: </span>
+									<span className="font-mono text-jj-purple">
+										{selectedCommit.changeId}
+									</span>
+								</div>
+								<div>
+									<span className="text-text-dim">Commit ID: </span>
+									<span className="font-mono text-text-secondary">
+										{selectedCommit.commitId}
+									</span>
+								</div>
+								<div>
+									<span className="text-text-dim">Author: </span>
+									<span>{selectedCommit.authorEmail}</span>
+								</div>
+								<div>
+									<span className="text-text-dim">Time: </span>
+									<RelativeTime timestamp={selectedCommit.timestamp} />
+								</div>
+								<div>
+									<span className="text-text-dim">Parents: </span>
+									<span className="font-mono">
+										{selectedCommit.parents.join(", ") || "(root)"}
+									</span>
+								</div>
+								{selectedCommit.bookmarks.length > 0 && (
+									<div className="flex gap-1 flex-wrap">
+										{selectedCommit.bookmarks.map((b) => (
+											<span
+												key={b}
+												className="text-[10px] bg-wc-green/15 text-wc-green px-1.5 py-0.5 rounded font-mono"
+											>
+												{b}
+											</span>
 										))}
 									</div>
-								) : (
-									<div className="text-text-dim">変更なし（empty commit）</div>
-								)
-							) : null}
+								)}
+							</div>
+
+							{/* Evolog */}
+							<div className="w-2/5 p-3 overflow-auto text-xs">
+								<div className="font-bold text-text-dim text-[10px] uppercase tracking-wider mb-2">
+									Evolog
+									<span className="font-normal normal-case text-text-dim ml-2">
+										{t("detail.evolog.subtitle")}
+									</span>
+								</div>
+								{fetcher.state === "loading" ? (
+									<div className="text-text-dim">Loading...</div>
+								) : fetcher.data?.evolog ? (
+									<div className="space-y-0.5">
+										{fetcher.data.evolog.map((entry, i) => {
+											const diffData = fetcher.data?.evologDiffs?.[i];
+											const isExpanded = expandedEvologIdx === i;
+											const hasDiff = diffData && diffData.files.length > 0;
+
+											return (
+												<Fragment key={entry.commitId}>
+													<button
+														type="button"
+														onClick={() =>
+															hasDiff &&
+															setExpandedEvologIdx(isExpanded ? null : i)
+														}
+														className={`w-full text-left flex items-center gap-2 px-2 py-1 rounded transition-colors ${
+															i === 0
+																? "bg-jj-purple/10 border border-jj-purple/20"
+																: isExpanded
+																	? "bg-jj-blue/10 border border-jj-blue/20"
+																	: "hover:bg-surface-raised"
+														} ${hasDiff ? "cursor-pointer" : "cursor-default"}`}
+													>
+														<span className="font-mono text-[10px] text-text-muted w-20 shrink-0">
+															{entry.commitId}
+														</span>
+														<RelativeTime timestamp={entry.timestamp} />
+														{entry.empty && (
+															<span className="text-[9px] bg-yellow-500/15 text-yellow-400 px-1 rounded">
+																empty
+															</span>
+														)}
+														{hasDiff && (
+															<span className="text-[9px] text-jj-blue ml-auto shrink-0">
+																{isExpanded ? "▼" : "▶"} {diffData.files.length}{" "}
+																files
+															</span>
+														)}
+														{i === 0 && (
+															<span className="text-[9px] text-jj-purple ml-auto shrink-0">
+																latest
+															</span>
+														)}
+													</button>
+													{isExpanded && diffData && (
+														<div className="ml-4 pl-2 border-l-2 border-jj-blue/30 py-1 space-y-0.5">
+															<div className="text-[9px] text-text-dim mb-1">
+																{t("detail.evolog.diffLabel")}
+															</div>
+															{diffData.files.map((f) => (
+																<div
+																	key={f.path}
+																	className="flex items-center gap-1.5 font-mono text-[11px]"
+																>
+																	<span
+																		className={`font-bold w-3 text-center ${
+																			f.status === "A"
+																				? "text-wc-green"
+																				: f.status === "M"
+																					? "text-jj-blue"
+																					: f.status === "D"
+																						? "text-git-red"
+																						: "text-text-muted"
+																		}`}
+																	>
+																		{f.status}
+																	</span>
+																	<span className="text-text-secondary truncate">
+																		{f.path}
+																	</span>
+																</div>
+															))}
+														</div>
+													)}
+												</Fragment>
+											);
+										})}
+										<div className="text-[10px] text-text-dim mt-2 border-t border-border pt-2">
+											{t("detail.evolog.explanation")}
+										</div>
+									</div>
+								) : null}
+							</div>
+
+							{/* Changed Files */}
+							<div className="flex-1 p-3 overflow-auto text-xs">
+								<div className="font-bold text-text-dim text-[10px] uppercase tracking-wider mb-2">
+									Changed Files
+									<span className="font-normal normal-case text-text-dim ml-2">
+										{t("detail.changedFiles.subtitle")}
+									</span>
+								</div>
+								{fetcher.state === "loading" ? (
+									<div className="text-text-dim">Loading...</div>
+								) : fetcher.data?.diff ? (
+									fetcher.data.diff.length > 0 ? (
+										<div className="space-y-0.5">
+											{fetcher.data.diff.map((f) => (
+												<div
+													key={f.path}
+													className="flex items-center gap-2 font-mono"
+												>
+													<span
+														className={`text-[10px] font-bold w-4 text-center ${
+															f.status === "A"
+																? "text-wc-green"
+																: f.status === "M"
+																	? "text-jj-blue"
+																	: f.status === "D"
+																		? "text-git-red"
+																		: "text-text-muted"
+														}`}
+													>
+														{f.status}
+													</span>
+													<span className="text-text-secondary truncate">
+														{f.path}
+													</span>
+												</div>
+											))}
+										</div>
+									) : (
+										<div className="text-text-dim">
+											{t("detail.changedFiles.noChanges")}
+										</div>
+									)
+								) : null}
+							</div>
 						</div>
 					</div>
-				</div>
 				</>
 			)}
 		</div>

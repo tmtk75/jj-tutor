@@ -1,0 +1,40 @@
+{
+	"pageSubtitle": "Revision diffs and the relationship between operations and evolog",
+	"loading": "Loading...",
+	"noDiff": "No diff",
+	"emptyCommit": "No changes (empty commit)",
+	"revisionDiff": {
+		"title": "Change contents",
+		"description": "Shows how each change differs from its parent. Since jj auto-snapshots, you always see the latest diff.",
+		"filesChanged": "{{count}} file changed",
+		"filesChanged_other": "{{count}} files changed"
+	},
+	"divergentWarning": {
+		"title": "Divergent Change (??)",
+		"description": "This change ID has diverged into multiple commits.",
+		"abandonHint": "to discard the unwanted one, or use",
+		"opRestoreHint": "to restore to before the divergence.",
+		"faqLink": "See FAQ for details →"
+	},
+	"operationEvolution": {
+		"opLogDescription": "History of all operations.",
+		"evologDescription": "Evolution history of a specific change (subset of op log). Select a change to highlight the operations that affected it.",
+		"selectHint": "Select a change and click Load to show the relationship between op log and evolog",
+		"opLogVsEvolog": {
+			"title": "op log vs evolog",
+			"opLog": "All repository operations (new, commit, snapshot...)",
+			"evolog": "Evolution history of a specific change. Op log filtered for a single change",
+			"opLogComment": "# all operations",
+			"evologComment": "# only @'s history"
+		},
+		"evologEntries": "{{count}} evolog entries / {{opCount}} operations"
+	},
+	"evologLegend": {
+		"description": "Evolution history of this change. Each file modification updates the commit ID (change ID remains constant).",
+		"opRelation": "Each entry is tied to an operation (jj's operation record).",
+		"opLogNote": "records all repository operations, but evolog filters only",
+		"filterNote": "operations that affected this change",
+		"filterSuffix": "."
+	},
+	"firstSnapshot": "(initial snapshot)"
+}
