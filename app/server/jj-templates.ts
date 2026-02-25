@@ -13,7 +13,8 @@ export const JJ_LOG_TEMPLATE = [
 	'  "\\"divergent\\":" ++ json(divergent) ++ ",",',
 	'  "\\"hidden\\":" ++ json(hidden) ++ ",",',
 	'  "\\"isWorkingCopy\\":" ++ json(current_working_copy) ++ ",",',
-	'  "\\"bookmarks\\":\\"" ++ bookmarks.map(|b| b.name()).join(",") ++ "\\"",',
+	'  "\\"bookmarks\\":\\"" ++ bookmarks.map(|b| b.name()).join(",") ++ "\\",",',
+	'  "\\"tags\\":\\"" ++ tags.map(|t| t.name()).join(",") ++ "\\"",',
 	'  "}\\n"',
 	")",
 ].join("\n");

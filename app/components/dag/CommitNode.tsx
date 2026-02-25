@@ -151,6 +151,18 @@ export function CommitNode({ data }: NodeProps<CommitNodeType>) {
 							))}
 						</div>
 					)}
+				{data.tags.length > 0 && (
+					<div className="flex gap-1 mt-1 flex-wrap">
+						{data.tags.map((tag) => (
+							<span
+								key={tag}
+								className="text-[10px] bg-amber-500/15 text-amber-400 px-1.5 py-0.5 rounded font-mono"
+							>
+								{tag}
+							</span>
+						))}
+					</div>
+				)}
 				</div>
 				{hint && (
 					<div className="w-28 px-2 py-2 text-[9px] text-text-dim leading-tight flex items-center">

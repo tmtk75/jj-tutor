@@ -12,7 +12,7 @@ const VALID_MODES: RebaseMode[] = ["revision", "subtree", "branch"];
 export async function loader({ request }: LoaderFunctionArgs) {
 	const start = performance.now();
 	const url = new URL(request.url);
-	const mode = url.searchParams.get("mode") as RebaseMode | null;
+	const mode = (url.searchParams.get("mode") as RebaseMode | null) ?? "revision";
 	const source = url.searchParams.get("source");
 	const dest = url.searchParams.get("dest");
 

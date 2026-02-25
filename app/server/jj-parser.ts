@@ -24,6 +24,9 @@ export async function getJjCommits(
 				bookmarks: raw.bookmarks
 					? raw.bookmarks.split(",").filter(Boolean)
 					: [],
+				tags: raw.tags
+					? raw.tags.split(",").filter(Boolean)
+					: [],
 			};
 		});
 }

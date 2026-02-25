@@ -30,6 +30,7 @@ const placeholder: JjCommit = {
 	hidden: false,
 	isWorkingCopy: false,
 	bookmarks: [],
+	tags: [],
 };
 
 // Helper to create simulated git commits

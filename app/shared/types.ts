@@ -14,6 +14,7 @@ export interface JjCommit {
 	hidden: boolean;
 	isWorkingCopy: boolean;
 	bookmarks: string[];
+	tags: string[];
 }
 
 export interface JjStatus {
