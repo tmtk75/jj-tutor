@@ -83,16 +83,34 @@ function buildGitGraph(commits: GitCommit[]) {
 
 const FIT_VIEW_OPTIONS = { padding: 0.2, minZoom: 0.7, maxZoom: 1 };
 
-/** After fitView, shift viewport so the topmost node sits at ~33% from the top. */
-function shiftToTop(rf: ReactFlowInstance, containerEl: HTMLElement | null) {
+/** After fitView, center viewport on a specific node. Falls back to topmost node. */
+function centerOnNode(
+	rf: ReactFlowInstance,
+	containerEl: HTMLElement | null,
+	targetNodeId?: string,
+) {
 	setTimeout(() => {
 		const nodes = rf.getNodes();
 		if (nodes.length === 0) return;
-		const minY = Math.min(...nodes.map((n) => n.position.y));
+		const target = targetNodeId
+			? nodes.find((n) => n.id === targetNodeId)
+			: null;
 		const vp = rf.getViewport();
+		const w = containerEl?.clientWidth ?? 800;
 		const h = containerEl?.clientHeight ?? 600;
-		const newY = h * 0.33 - minY * vp.zoom;
-		rf.setViewport({ x: vp.x, y: newY, zoom: vp.zoom });
+		if (target) {
+			const cx = target.position.x + 160; // NODE_WIDTH / 2
+			const cy = target.position.y + 40; // NODE_HEIGHT / 2
+			rf.setViewport({
+				x: w / 2 - cx * vp.zoom,
+				y: h / 2 - cy * vp.zoom,
+				zoom: vp.zoom,
+			});
+		} else {
+			const minY = Math.min(...nodes.map((n) => n.position.y));
+			const newY = h * 0.33 - minY * vp.zoom;
+			rf.setViewport({ x: vp.x, y: newY, zoom: vp.zoom });
+		}
 	}, 50);
 }
 
@@ -303,7 +321,8 @@ export function DagView({
 							onNodeClick={onNodeClick}
 							onInit={(rf) => {
 								rf.fitView(FIT_VIEW_OPTIONS);
-								shiftToTop(rf, jjDagRef.current);
+								const wc = jjCommits.find((c) => c.isWorkingCopy);
+								centerOnNode(rf, jjDagRef.current, wc?.commitId);
 							}}
 							minZoom={0.3}
 							maxZoom={2}
@@ -365,7 +384,10 @@ export function DagView({
 								nodeTypes={nodeTypes}
 								onInit={(rf) => {
 									rf.fitView(FIT_VIEW_OPTIONS);
-									shiftToTop(rf, gitDagRef.current);
+									const head = gitCommits.find((c) =>
+										c.refs.some((r) => r.includes("HEAD")),
+									);
+									centerOnNode(rf, gitDagRef.current, head?.hash);
 								}}
 								minZoom={0.3}
 								maxZoom={2}
