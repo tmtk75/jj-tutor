@@ -2,9 +2,9 @@
 
 # jj / tutor
 
-**Jujutsu (jj) VCS を対話的に学ぶためのローカル Web アプリケーション**
+**A local web application for learning Jujutsu (jj) VCS interactively**
 
-リアルタイム DAG 可視化 ・ jj / git 並列比較 ・ What-If 予測 ・ Revset プレイグラウンド
+Real-time DAG visualization · jj / git side-by-side comparison · What-If prediction · Revset playground
 
 [![React Router](https://img.shields.io/badge/React_Router-v7_(SSR)-6366f1?style=flat-square)](https://reactrouter.com/)
 [![Tailwind](https://img.shields.io/badge/Tailwind_CSS-v4-38bdf8?style=flat-square)](https://tailwindcss.com/)
@@ -17,11 +17,11 @@
 </div>
 
 > [!IMPORTANT]
-> jj tutor は **jj の Web UI ではありません**。日常の VCS 操作を行うツールではなく、jj の概念やコマンドを視覚的に理解するための**学習用アプリケーション**です。
+> jj tutor is **not a Web UI for jj**. It is not a tool for day-to-day VCS operations. It is an **educational application** designed to help you visually understand jj's concepts and commands.
 
 > [!NOTE]
-> ローカル専用ツールです。`pnpm run dev` で起動し、ブラウザから localhost にアクセスして使います。
-> 対象リポジトリの `jj` / `git` コマンドをサーバーサイドで実行し、3 秒間隔でリアルタイム更新します。
+> This is a local-only tool. Start it with `pnpm run dev` and access it via localhost in your browser.
+> It executes `jj` / `git` commands server-side against a target repository and refreshes every 3 seconds.
 
 ---
 
@@ -31,18 +31,18 @@
 <tr>
 <td width="50%">
 
-### DAG 可視化
+### DAG Visualization
 
-jj と git のコミットグラフを並列表示。ノードクリックでコミット詳細・evolog を確認。divergent / conflict 状態もアノテーション表示。
+Side-by-side commit graph for jj and git. Click a node to inspect commit details and evolog. Divergent and conflict states are annotated.
 
 <img src="docs/screenshots/dag-view.png" alt="DAG View" width="100%">
 
 </td>
 <td width="50%">
 
-### What-If 予測
+### What-If Prediction
 
-`jj new`, `jj commit`, `jj squash` 等の実行結果を事前に予測表示。対応する git コマンドも併記し、概念の橋渡しを支援。
+Preview the outcome of `jj new`, `jj commit`, `jj squash`, and more before executing. Shows the equivalent git commands to bridge concepts.
 
 <img src="docs/screenshots/whatif-view.png" alt="What If View" width="100%">
 
@@ -51,18 +51,18 @@ jj と git のコミットグラフを並列表示。ノードクリックでコ
 <tr>
 <td>
 
-### Diff ビューア
+### Diff Viewer
 
-Revision diff と Operation diff の 2 カラム表示。Unified / Split 切り替え対応。
+Two-column display for revision diffs and operation diffs. Toggle between unified and split views.
 
 <img src="docs/screenshots/diff-view.png" alt="Diff View" width="100%">
 
 </td>
 <td>
 
-### Commit ワークフロー
+### Commit Workflow
 
-commit / split / squash / describe の操作カードと Split シミュレーターで、jj のコミットモデルを体験。
+Operation cards for commit / split / squash / describe and a split simulator to experience jj's commit model hands-on.
 
 <img src="docs/screenshots/commit-view.png" alt="Commit View" width="100%">
 
@@ -71,9 +71,9 @@ commit / split / squash / describe の操作カードと Split シミュレー�
 <tr>
 <td>
 
-### Rebase シミュレーター
+### Rebase Simulator
 
-Source と Destination を DAG 上でクリック選択し、rebase の Before / After を予測表示。コンフリクトの可能性も事前に検出。
+Click to select source and destination on the DAG, then preview the before / after of a rebase. Potential conflicts are detected in advance.
 
 <img src="docs/screenshots/revset-view.png" alt="Rebase View" width="100%">
 
@@ -82,7 +82,7 @@ Source と Destination を DAG 上でクリック選択し、rebase の Before /
 
 ### Revset Playground
 
-revset 式を入力してコミットを検索・ハイライト。jj の強力なクエリ言語を試せる。
+Enter revset expressions to search and highlight commits. A sandbox for exploring jj's powerful query language.
 
 <img src="docs/screenshots/revset-view.png" alt="Revset Playground" width="100%">
 
@@ -95,10 +95,10 @@ revset 式を入力してコミットを検索・ハイライト。jj の強力�
 
 | Feature | Description |
 |---------|-------------|
-| **Status** | jj status と git status の並列比較。colocated 環境での差異も一目で把握 |
-| **Operations** | jj の操作ログを時系列表示。各オペレーション間の diff も確認可能 |
-| **Concepts** | jj と git の概念マッピング（Change vs Commit、Bookmark vs Branch 等） |
-| **FAQ** | colocated 環境の疑問や、jj 固有の概念に関する Q&A |
+| **Status** | Side-by-side comparison of jj status and git status. Spot differences in colocated environments at a glance |
+| **Operations** | Chronological operation log for jj. Diff between any two operations |
+| **Concepts** | Concept mapping between jj and git (Change vs Commit, Bookmark vs Branch, etc.) |
+| **FAQ** | Q&A on colocated environment quirks and jj-specific concepts |
 
 </details>
 
@@ -110,24 +110,24 @@ revset 式を入力してコミットを検索・ハイライト。jj の強力�
 
 | Tool | Purpose |
 |------|---------|
-| [mise](https://mise.jdx.dev/) | Node.js / pnpm バージョン管理 |
-| [jj](https://jj-vcs.github.io/jj/) | Jujutsu VCS (PATH に通っていること) |
+| [mise](https://mise.jdx.dev/) | Node.js / pnpm version management |
+| [jj](https://jj-vcs.github.io/jj/) | Jujutsu VCS (must be on PATH) |
 | git | Git CLI |
 
 ### Install & Run
 
 ```bash
-# 依存関係のインストール
+# Install dependencies
 mise install
 pnpm install
 
-# 任意のリポジトリを対象に起動
+# Start with a target repository
 JJ_TUTOR_REPO_PATH=/path/to/your-jj-repo pnpm run dev
 ```
 
-環境変数を省略すると、jj tutor 自身のリポジトリが対象になります。
+If the environment variable is omitted, jj tutor targets its own repository.
 
-ブラウザで **http://localhost:5173** を開いてください。
+Open **http://localhost:5173** in your browser.
 
 ---
 
@@ -148,4 +148,4 @@ JJ_TUTOR_REPO_PATH=/path/to/your-jj-repo pnpm run dev
 Route loader (server)  →  jj/git executor  →  parse stdout  →  React component (client)
 ```
 
-サーバーサイドの loader が `jj` / `git` コマンドを実行し、パース結果を React コンポーネントに渡します。Root layout が 3 秒ごとにポーリングし、リポジトリの状態をリアルタイムに反映します。
+Server-side loaders execute `jj` / `git` commands and pass parsed results to React components. The root layout polls every 3 seconds to keep the UI in sync with the repository state.
