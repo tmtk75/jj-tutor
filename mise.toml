@@ -1,3 +1,7 @@
 [tools]
 node = "24.7.0"
 pnpm = "10.17.0"
+
+[tasks.install]
+description = "Install jj-tutor to ~/.local/bin"
+run = "ln -sf {{config_root}}/bin/jj-tutor ~/.local/bin/jj-tutor && echo 'Installed: ~/.local/bin/jj-tutor'"

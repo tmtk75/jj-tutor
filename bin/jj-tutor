@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+JJ_TUTOR_DIR="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+
+if [[ $# -ge 1 ]]; then
+	export JJ_TUTOR_REPO_PATH="$1"
+elif jj workspace root &>/dev/null; then
+	export JJ_TUTOR_REPO_PATH="$(jj workspace root)"
+else
+	export JJ_TUTOR_REPO_PATH="$PWD"
+fi
+
+PORT="${JJ_TUTOR_PORT:-3000}"
+export PORT
+
+echo "jj-tutor: targeting $JJ_TUTOR_REPO_PATH"
+cd "$JJ_TUTOR_DIR"
+
+pnpm run build
+
+# Open browser after a short delay to let the server start
+(sleep 1 && open "http://localhost:${PORT}") &
+
+exec pnpm run start
